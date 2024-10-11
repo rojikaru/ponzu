@@ -11,21 +11,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from .env import ENVIRON
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*qq$b-c_47@1_w3ge=9wq-^@=4z@qg%$d2f*$1#olm_%pthjmj'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+SECRET_KEY = ENVIRON('SECRET_KEY')
+DEBUG = ENVIRON('DEBUG')
+ALLOWED_HOSTS = ENVIRON('ALLOWED_HOSTS').split(',')
 
 
 # Application definition
@@ -37,6 +30,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third party apps
+    'rest_framework',
+    'djongo',
+    # 'corsheaders',
+
+    # Local apps
+    'otaku_back',
 ]
 
 MIDDLEWARE = [
@@ -76,8 +77,13 @@ WSGI_APPLICATION = 'otaku_back.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'otaku',
+        'CLIENT': {
+            'host': ENVIRON('DATABASE_URL'),
+            'username': ENVIRON('DATABASE_USER'),
+            'password': ENVIRON('DATABASE_PASSWORD'),
+        }
     }
 }
 
@@ -105,11 +111,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
