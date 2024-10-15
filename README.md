@@ -15,6 +15,11 @@ OtakuRank is an anime and manga library application that allows users to rate, c
 - Backend: Django
 - Database: MongoDB
 - Frontend: Next.js
+- State Management: Jotai
+- Styling: Tailwind CSS
+<!-- - API: Jikan API -->
+- API: AniList API
+- Deployment: Heroku
 
 ## Prerequisites
 
@@ -85,3 +90,5 @@ For any questions or concerns, please open an issue on this repository or contac
 ---
 
 Happy coding, and may your favorite series always be top-ranked! 🌟
+
+![Pythor](https://github.com/rojikaru/otaku-rank/blob/main/pythor.webp)
