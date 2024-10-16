@@ -1,10 +1,8 @@
-from typing import Generic, TypeVar, List, Optional
+from typing import List, Optional
 from django.db import models
 
-T = TypeVar('T', bound=models.Model)
-
-class Repository(Generic[T]):
-    def __init__(self, model: T):
+class Repository[T: models.Model]:
+    def __init__(self, model: type[T]):
         self._model = model
 
     def get_all(self) -> List[T]:
