@@ -17,13 +17,15 @@ OtakuRank is an anime and manga library application that allows users to rate, c
 - Frontend: Next.js
 - State Management: Jotai
 - Styling: Tailwind CSS
-<!-- - API: Jikan API -->
-- API: AniList API
+- API: Jikan API
 - Deployment: Heroku
+
+[//]: # (- API: AniList API)
+
 
 ## Prerequisites
 
-- Python 3.11+
+- Python 3.12+
 - Node.js 20+
 - MongoDB
 
