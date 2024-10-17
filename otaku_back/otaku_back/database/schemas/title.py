@@ -14,13 +14,23 @@ class Title(models.Model):
     title = models.TextField()
     title_english = models.TextField()
     title_japanese = models.TextField()
-    title_synonyms = models.ArrayField(model_container=str)
+    title_synonyms = models.JSONField()
     # titles = models.ArrayField(models.JSONField)
 
     type = models.TextField()
     episodes = models.PositiveIntegerField()
-    genres = models.ArrayField(model_container=Genre)
-    demographics = models.ArrayField(model_container=Demographic)
+    genres = models.ArrayReferenceField(
+        to=Genre,
+        on_delete=models.CASCADE,
+        to_field='mal_id',
+        blank=True
+    )
+    demographics = models.ArrayReferenceField(
+        to=Demographic,
+        on_delete=models.CASCADE,
+        to_field='mal_id',
+        blank=True
+    )
     synopsis = models.TextField()
 
     # aired = models.JSONField()
@@ -34,6 +44,9 @@ class Title(models.Model):
     rank = models.PositiveIntegerField()
 
     images = models.JSONField()
+
+    def __str__(self):
+        return f'{self.title} ({self.year}, ID: {self.mal_id})'
 
 
 class Anime(Title):
