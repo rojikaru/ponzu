@@ -25,13 +25,13 @@ from .views.title_views import AnimeViewSet, MangaViewSet
 from .views.user_views import UserViewSet
 
 router = DefaultRouter()
-router.register(r'demographics', DemographicViewSet)
-router.register(r'users', UserViewSet)
+router.register(r'demographic', DemographicViewSet)
+router.register(r'user', UserViewSet)
 router.register(r'anime', AnimeViewSet)
 router.register(r'manga', MangaViewSet)
-router.register(r'genres', GenreViewSet)
-router.register(r'anime-reviews', AnimeReviewViewSet)
-router.register(r'manga-reviews', MangaReviewViewSet)
+router.register(r'genre', GenreViewSet)
+router.register(r'review/anime', AnimeReviewViewSet)
+router.register(r'review/manga', MangaReviewViewSet)
 
 # The `urlpatterns` list routes URLs to views.
 urlpatterns = [
