@@ -9,8 +9,10 @@ from .user import User
 
 class JSONSerializerField(serializers.Field):
     """ Serializer for JSONField -- required to make field writable"""
+
     def to_internal_value(self, data):
         return data
+
     def to_representation(self, value):
         return value
 
@@ -38,6 +40,7 @@ class AnimeSerializer(serializers.ModelSerializer):
         model = Anime
         fields = '__all__'
 
+
 class MangaSerializer(serializers.ModelSerializer):
     genres = JSONSerializerField()
     demographics = JSONSerializerField()
@@ -51,12 +54,18 @@ class MangaSerializer(serializers.ModelSerializer):
 
 
 class AnimeReviewSerializer(serializers.ModelSerializer):
+    anime = serializers.PrimaryKeyRelatedField(queryset=Anime.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
     class Meta:
         model = AnimeReview
         fields = '__all__'
 
 
 class MangaReviewSerializer(serializers.ModelSerializer):
+    manga = serializers.PrimaryKeyRelatedField(queryset=Manga.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
     class Meta:
         model = MangaReview
         fields = '__all__'
@@ -76,4 +85,3 @@ class UserSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
-
