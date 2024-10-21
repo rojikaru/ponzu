@@ -18,9 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .env import ENVIRON
+from .views.demographic_views import DemographicViewSet
+from .views.genre_views import GenreViewSet
+from .views.review_views import AnimeReviewViewSet, MangaReviewViewSet
+from .views.title_views import AnimeViewSet, MangaViewSet
+from .views.user_views import UserViewSet
 
-# TODO: Register all view sets (controllers) under the `router` object
 router = DefaultRouter()
+router.register(r'demographics', DemographicViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'anime', AnimeViewSet)
+router.register(r'manga', MangaViewSet)
+router.register(r'genres', GenreViewSet)
+router.register(r'anime-reviews', AnimeReviewViewSet)
+router.register(r'manga-reviews', MangaReviewViewSet)
 
 # The `urlpatterns` list routes URLs to views.
 urlpatterns = [
