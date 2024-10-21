@@ -28,8 +28,8 @@ class DemographicSerializer(serializers.ModelSerializer):
 
 
 class AnimeSerializer(serializers.ModelSerializer):
-    genres = GenreSerializer(many=True)
-    demographics = DemographicSerializer(many=True)
+    genres = JSONSerializerField()
+    demographics = JSONSerializerField()
     title_synonyms = JSONSerializerField()
     producers = JSONSerializerField()
     images = JSONSerializerField()
@@ -39,8 +39,8 @@ class AnimeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MangaSerializer(serializers.ModelSerializer):
-    genres = GenreSerializer(many=True)
-    demographics = DemographicSerializer(many=True)
+    genres = JSONSerializerField()
+    demographics = JSONSerializerField()
     title_synonyms = JSONSerializerField()
     producers = JSONSerializerField()
     images = JSONSerializerField()

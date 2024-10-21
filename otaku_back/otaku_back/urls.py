@@ -20,7 +20,7 @@ from rest_framework.routers import DefaultRouter
 from .env import ENVIRON
 from .viewsets.demographic import DemographicViewSet
 from .viewsets.genre import GenreViewSet
-from .viewsets.review_views import AnimeReviewViewSet, MangaReviewViewSet
+from .viewsets.review import AnimeReviewViewSet, MangaReviewViewSet
 from .viewsets.title import AnimeViewSet, MangaViewSet
 from .viewsets.user import UserViewSet
 
