@@ -19,18 +19,8 @@ class Title(models.Model):
 
     type = models.TextField()
     episodes = models.PositiveIntegerField()
-    genres = models.ArrayReferenceField(
-        to=Genre,
-        on_delete=models.CASCADE,
-        to_field='mal_id',
-        blank=True
-    )
-    demographics = models.ArrayReferenceField(
-        to=Demographic,
-        on_delete=models.CASCADE,
-        to_field='mal_id',
-        blank=True
-    )
+    genres = models.JSONField() # weak relationship
+    demographics = models.JSONField()
     synopsis = models.TextField()
 
     # aired = models.JSONField()
