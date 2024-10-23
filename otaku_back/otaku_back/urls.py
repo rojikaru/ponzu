@@ -20,6 +20,7 @@ from rest_framework.routers import DefaultRouter
 from .env import ENVIRON
 from .viewsets.demographic import DemographicViewSet
 from .viewsets.genre import GenreViewSet
+from .viewsets.producer import ProducerViewSet
 from .viewsets.user import UserViewSet
 from .viewsets.anime.title import AnimeViewSet
 from .viewsets.manga.title import MangaViewSet
@@ -32,6 +33,7 @@ router.register(r'user', UserViewSet, basename='user')
 router.register(r'anime', AnimeViewSet, basename='anime')
 router.register(r'manga', MangaViewSet, basename='manga')
 router.register(r'genre', GenreViewSet, basename='genre')
+router.register(r'producer', ProducerViewSet, basename='producer')
 router.register(r'review/anime', AnimeReviewViewSet, basename='anime_review')
 router.register(r'review/manga', MangaReviewViewSet, basename='manga_review')
 
