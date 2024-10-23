@@ -29,23 +29,8 @@ class Repository[T: models.Model]:
         related_data = {k: kwargs.pop(k) for k in list(kwargs.keys()) if k in related_fields}
 
         instance = self._model.objects.create(**kwargs)
-
-        # Handle foreign fields after creation
-        for field, related_ids in related_data.items():
-            if len(related_ids) == 0:
-                continue
-
-            # if the field is a many-to-many field
-            field = getattr(self._model, field).field
-            if isinstance(field, models.ManyToManyField):
-                getattr(instance, field.name).set(related_ids)
-
-            # if the field is a foreign key field
-            else:
-                setattr(instance, field, related_ids)
-
-        instance.save()
-        return instance
+        return self._handle_related_fields(instance, related_data)
+        
 
     def update(self, instance_id, **kwargs) -> Optional[T]:
         instance = self.get_by_id(instance_id)
@@ -64,9 +49,7 @@ class Repository[T: models.Model]:
         instance.save()
 
         # Handle many-to-many updates
-        for field, related_ids in related_data.items():
-            if isinstance(getattr(self._model, field).field, models.ManyToManyField):
-                getattr(instance, field).set(related_ids)
+        self._handle_related_fields(instance, related_data)
 
         instance.save()
         return instance
@@ -98,3 +81,22 @@ class Repository[T: models.Model]:
         Get the primary key field name.
         """
         return self._model._meta.pk.name
+
+    def _handle_related_fields(self, instance, related_data):
+        # Handle foreign fields
+        for field, related_ids in related_data.items():
+            # if the field is a many-to-many field
+            field_attr = getattr(self._model, field).field
+            if isinstance(field_attr, models.ManyToManyField):
+                getattr(instance, field).set(related_ids)
+
+            # if the field is a foreign key field
+            else:
+                # Fetch related field
+                related_model = self._model._meta.get_field(field).related_model
+                related_pk = related_model._meta.pk.name
+                related_obj = related_model.objects.get(**{related_pk: related_ids})
+                setattr(instance, field, related_obj)
+
+        instance.save()
+        return instance
