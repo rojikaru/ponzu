@@ -6,7 +6,7 @@ class User(models.Model):
     _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     username = models.TextField()
-    password = models.TextField() # Hashed, ofc
+    password = models.TextField()  # Hashed, ofc
 
     email = models.EmailField()
     image = models.TextField()
