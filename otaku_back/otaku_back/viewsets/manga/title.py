@@ -2,36 +2,37 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from otaku_back.database.repository import Repository
-from otaku_back.database.schemas.serializers import UserSerializer
-from otaku_back.database.schemas.user import User
+from otaku_back.database.schemas.serializers import MangaSerializer
+from otaku_back.database.schemas.title import Manga
 
 
-class UserViewSet(viewsets.ViewSet):
-    serializer_class = UserSerializer
-    repository = Repository(User)
+class MangaViewSet(viewsets.ViewSet):
+    serializer_class = MangaSerializer
+    repository = Repository(Manga)
 
     def list(self, request):
-        users = self.repository.get_all()
-        serializer = self.serializer_class(users, many=True)
+        mangas = self.repository.get_all()
+        serializer = self.serializer_class(mangas, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        user = self.repository.get_by_id(pk)
-        if not user:
+        manga = self.repository.get_by_id(pk)
+        if not manga:
             return Response(status=404)
-        serializer = self.serializer_class(user)
+        serializer = self.serializer_class(manga)
         return Response(serializer.data)
 
     def create(self, request):
-        user = self.repository.create(**request.data)
-        serializer = self.serializer_class(user)
+        manga = self.repository.create(**request.data)
+        serializer = self.serializer_class(manga)
         return Response(serializer.data, status=201)
 
+
     def partial_update(self, request, pk=None):
-        user = self.repository.update(pk, **request.data)
-        if not user:
+        manga = self.repository.update(pk, **request.data)
+        if not manga:
             return Response(status=404)
-        serializer = self.serializer_class(user)
+        serializer = self.serializer_class(manga)
         return Response(serializer.data)
 
     def destroy(self, request, pk=None):

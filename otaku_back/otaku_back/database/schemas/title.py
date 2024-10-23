@@ -19,8 +19,8 @@ class Title(models.Model):
 
     type = models.TextField()
     episodes = models.PositiveIntegerField()
-    genres = models.JSONField() # weak relationship
-    demographics = models.JSONField()
+    genres = models.ManyToManyField(Genre)
+    demographics = models.ManyToManyField(Demographic)
     synopsis = models.TextField()
 
     # aired = models.JSONField()

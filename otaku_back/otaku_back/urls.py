@@ -20,9 +20,11 @@ from rest_framework.routers import DefaultRouter
 from .env import ENVIRON
 from .viewsets.demographic import DemographicViewSet
 from .viewsets.genre import GenreViewSet
-from .viewsets.review import AnimeReviewViewSet, MangaReviewViewSet
-from .viewsets.title import AnimeViewSet, MangaViewSet
 from .viewsets.user import UserViewSet
+from .viewsets.anime.title import AnimeViewSet
+from .viewsets.manga.title import MangaViewSet
+from .viewsets.anime.review import AnimeReviewViewSet
+from .viewsets.manga.review import MangaReviewViewSet
 
 router = DefaultRouter()
 router.register(r'demographic', DemographicViewSet, basename='demographic')

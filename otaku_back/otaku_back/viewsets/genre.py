@@ -23,19 +23,15 @@ class GenreViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=400)
-        self.repository.create(**serializer.validated_data)
+        genre = self.repository.create(**request.data)
+        serializer = self.serializer_class(genre)
         return Response(serializer.data, status=201)
 
-    def update(self, request, pk=None):
-        serializer = self.serializer_class(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=400)
-        genre = self.repository.update(pk, **serializer.validated_data)
+    def partial_update(self, request, pk=None):
+        genre = self.repository.update(pk, **request.data)
         if not genre:
             return Response(status=404)
+        serializer = self.serializer_class(genre)
         return Response(serializer.data)
 
     def destroy(self, request, pk=None):
