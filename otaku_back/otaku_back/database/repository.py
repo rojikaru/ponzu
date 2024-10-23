@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from django.core.exceptions import BadRequest
 from django.db import models
+from rest_framework import status
 
 
 class Repository[T: models.Model]:
@@ -30,9 +31,11 @@ class Repository[T: models.Model]:
 
         instance = self._model.objects.create(**kwargs)
         return self._handle_related_fields(instance, related_data)
-        
 
     def update(self, instance_id, **kwargs) -> Optional[T]:
+        if kwargs.get(self._get_primary_key()) is not None:
+            raise BadRequest('Changing id is prohibited')
+
         instance = self.get_by_id(instance_id)
         if not instance:
             return None
