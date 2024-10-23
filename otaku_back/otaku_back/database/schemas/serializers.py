@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .genre import Genre
 from .demographic import Demographic
+from .producer import Producer
 from .title import Anime, Manga
 from .review import AnimeReview, MangaReview
 from .user import User
@@ -23,6 +24,12 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ProducerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Producer
+        fields = '__all__'
+
+
 class DemographicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Demographic
@@ -30,22 +37,22 @@ class DemographicSerializer(serializers.ModelSerializer):
 
 
 class AnimeSerializer(serializers.ModelSerializer):
-    genres = JSONSerializerField()
-    demographics = JSONSerializerField()
+    genres = GenreSerializer(many=True)
+    demographics = DemographicSerializer(many=True)
     title_synonyms = JSONSerializerField()
-    producers = JSONSerializerField()
+    producers = ProducerSerializer(many=True)
     images = JSONSerializerField()
 
     class Meta:
         model = Anime
         fields = '__all__'
-
+    
 
 class MangaSerializer(serializers.ModelSerializer):
-    genres = JSONSerializerField()
-    demographics = JSONSerializerField()
+    genres = GenreSerializer(many=True)
+    demographics = DemographicSerializer(many=True)
     title_synonyms = JSONSerializerField()
-    producers = JSONSerializerField()
+    producers = ProducerSerializer(many=True)
     images = JSONSerializerField()
 
     class Meta:
