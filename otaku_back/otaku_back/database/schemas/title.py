@@ -2,6 +2,7 @@ from djongo import models
 
 from .demographic import Demographic
 from .genre import Genre
+from .producer import Producer
 
 
 # We'll follow the same structure as Jikan API
@@ -27,7 +28,7 @@ class Title(models.Model):
     # airing = models.BooleanField()
     status = models.TextField()
     # duration = models.TextField()
-    producers = models.JSONField()
+    producers = models.ManyToManyField(Producer)
     year = models.PositiveIntegerField()
 
     score = models.FloatField()
