@@ -1,8 +1,6 @@
-from djongo import models
 import uuid
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
-
 from django.db import models
 
 
@@ -38,22 +36,17 @@ class UserManager(BaseUserManager):
 
 class User(BaseUser):
     _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     username = models.TextField()
     password = models.TextField()  # Hashed, ofc
-
     email = models.EmailField()
     image = models.TextField()
     bio = models.TextField()
     birth_date = models.DateField()
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    # roles = models.ArrayField(
-    #     model_container=models.CharField(max_length=255)
-    # )
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     objects = UserManager()
 

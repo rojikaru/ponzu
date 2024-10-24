@@ -102,12 +102,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AuthSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
+    username = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField(write_only=True, required=False)
+    refresh_token = serializers.CharField(required=False, write_only=True)
 
-    def validate(self, attrs):
-        username = attrs.get('username')
-        password = attrs.get('password')
+    def validate_login(self, data):
+        username = data.get('username')
+        password = data.get('password')
 
         try:
             user = User.objects.get(email=username)
@@ -121,30 +123,29 @@ class AuthSerializer(serializers.Serializer):
         if auth_user is None:
             raise AuthenticationFailed('Invalid credentials')
 
-        # JWT generation logic
-        payload = {
-            'user_id': str(auth_user._id), 
+        access_payload = {
+            'user_id': str(auth_user._id),
             'username': auth_user.username,
-            'exp': datetime.utcnow() + timedelta(days=1),  
+            'exp': datetime.utcnow() + timedelta(minutes=15),
             'iat': datetime.utcnow()
         }
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        refresh_payload = {
+            'user_id': str(auth_user._id),
+            'username': auth_user.username,
+            'exp': datetime.utcnow() + timedelta(days=7),
+            'iat': datetime.utcnow()
+        }
+        access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm='HS256')
+        refresh_token = jwt.encode(refresh_payload, settings.SECRET_KEY, algorithm='HS256')
 
         return {
-            # 'refresh_token': None,
-            'access_token': token
+            'access_token': access_token,
+            'refresh_token': refresh_token
         }
 
-
-class RegisterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def validate(self, data):
-        email = data.get('email', None)
-        username = data.get('username', None)
+    def validate_register(self, data):
+        email = data.get('email')
+        username = data.get('username')
 
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError("A user with this email already exists.")
@@ -154,7 +155,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return data
 
-    def create(self, validated_data):
+    def create_user(self, validated_data):
         user = User.objects.create_user(
             email=validated_data['email'],
             username=validated_data['username'],
@@ -164,3 +165,47 @@ class RegisterSerializer(serializers.ModelSerializer):
             birth_date=validated_data.get('birth_date', None)
         )
         return user
+
+    def create_superuser(self, validated_data):
+        user = User.objects.create_superuser(
+            email=validated_data['email'],
+            username=validated_data['username'],
+            password=validated_data['password']
+        )
+        return user
+
+    def validate_refresh(self, data):
+        refresh_token = data.get('refresh_token')
+
+        try:
+            payload = jwt.decode(refresh_token, settings.SECRET_KEY, algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Refresh token has expired')
+        except jwt.InvalidTokenError:
+            raise AuthenticationFailed('Invalid refresh token')
+
+        user_id = payload.get('user_id')
+        try:
+            user = User.objects.get(_id=user_id)
+        except User.DoesNotExist:
+            raise AuthenticationFailed('User not found')
+
+        access_payload = {
+            'user_id': str(user._id),
+            'username': user.username,
+            'exp': datetime.utcnow() + timedelta(minutes=15),
+            'iat': datetime.utcnow()
+        }
+        refresh_payload = {
+            'user_id': str(user._id),
+            'username': user.username,
+            'exp': datetime.utcnow() + timedelta(days=7),
+            'iat': datetime.utcnow()
+        }
+        access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm='HS256')
+        new_refresh_token = jwt.encode(refresh_payload, settings.SECRET_KEY, algorithm='HS256')
+
+        return {
+            'access_token': access_token,
+            'refresh_token': new_refresh_token
+        }
