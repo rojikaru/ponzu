@@ -17,7 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
 from .env import ENVIRON
+from .viewsets.auth import AuthViewSet
 from .viewsets.demographic import DemographicViewSet
 from .viewsets.genre import GenreViewSet
 from .viewsets.producer import ProducerViewSet
@@ -36,8 +38,7 @@ router.register(r'genre', GenreViewSet, basename='genre')
 router.register(r'producer', ProducerViewSet, basename='producer')
 router.register(r'review/anime', AnimeReviewViewSet, basename='anime_review')
 router.register(r'review/manga', MangaReviewViewSet, basename='manga_review')
-
-# The `urlpatterns` list routes URLs to viewsets.
+router.register(r'auth', AuthViewSet, basename='auth')
 urlpatterns = [
     path('api/', include(router.urls)),
 ]

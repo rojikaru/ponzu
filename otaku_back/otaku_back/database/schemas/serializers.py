@@ -1,11 +1,18 @@
+from datetime import datetime, timedelta
+
+import jwt
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 
 from .genre import Genre
 from .demographic import Demographic
 from .producer import Producer
 from .title import Anime, Manga
 from .review import AnimeReview, MangaReview
+
 from .user import User
+from ... import settings
+from otaku_back.security.authentication import UserBackend
 
 
 class JSONSerializerField(serializers.Field):
@@ -92,3 +99,38 @@ class UserSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+
+
+class AuthSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        try:
+            user = User.objects.get(email=username)
+            username = user.username
+        except User.DoesNotExist:
+            username = username
+
+        user_backend = UserBackend()
+        auth_user = user_backend.authenticate(request=None, username=username, password=password)
+
+        if auth_user is None:
+            raise AuthenticationFailed('Invalid credentials')
+
+        # JWT generation logic
+        payload = {
+            'user_id': str(auth_user._id), 
+            'username': auth_user.username,
+            'exp': datetime.utcnow() + timedelta(days=1),  
+            'iat': datetime.utcnow()
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+
+        return {
+            # 'refresh_token': None,
+            'access_token': token
+        }
