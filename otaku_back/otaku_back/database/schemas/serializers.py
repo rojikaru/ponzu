@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from uuid import uuid4
 
 import jwt
 from rest_framework import serializers
@@ -130,10 +131,7 @@ class AuthSerializer(serializers.Serializer):
             'iat': datetime.utcnow()
         }
         refresh_payload = {
-            'user_id': str(auth_user._id),
-            'username': auth_user.username,
-            'exp': datetime.utcnow() + timedelta(days=7),
-            'iat': datetime.utcnow()
+            'sub': str(auth_user._id) 
         }
         access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm='HS256')
         refresh_token = jwt.encode(refresh_payload, settings.SECRET_KEY, algorithm='HS256')
@@ -185,7 +183,10 @@ class AuthSerializer(serializers.Serializer):
         except jwt.InvalidTokenError:
             raise AuthenticationFailed('Invalid refresh token')
 
-        user_id = payload.get('user_id')
+        user_id = payload.get('sub')
+        if not user_id:
+            raise AuthenticationFailed('Invalid refresh token')
+
         try:
             user = User.objects.get(_id=user_id)
         except User.DoesNotExist:
@@ -198,10 +199,7 @@ class AuthSerializer(serializers.Serializer):
             'iat': datetime.utcnow()
         }
         refresh_payload = {
-            'user_id': str(user._id),
-            'username': user.username,
-            'exp': datetime.utcnow() + timedelta(days=7),
-            'iat': datetime.utcnow()
+            'sub': str(user._id)
         }
 
         access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm='HS256')
