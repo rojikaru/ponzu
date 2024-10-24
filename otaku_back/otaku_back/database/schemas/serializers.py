@@ -134,3 +134,33 @@ class AuthSerializer(serializers.Serializer):
             # 'refresh_token': None,
             'access_token': token
         }
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate(self, data):
+        email = data.get('email', None)
+        username = data.get('username', None)
+
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+
+        return data
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            username=validated_data['username'],
+            password=validated_data['password'],
+            image=validated_data.get('image', ''),
+            bio=validated_data.get('bio', ''),
+            birth_date=validated_data.get('birth_date', None)
+        )
+        return user
