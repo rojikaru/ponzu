@@ -4,11 +4,13 @@ from rest_framework.response import Response
 from otaku_back.database.repository import Repository
 from otaku_back.database.schemas.producer import Producer
 from otaku_back.database.schemas.serializers import ProducerSerializer
+from otaku_back.security.permissions import AdminPermission
 
 
 class ProducerViewSet(viewsets.ViewSet):
     serializer_class = ProducerSerializer
     repository = Repository(Producer)
+    permission_classes = [AdminPermission]
 
     def list(self, request):
         producers = self.repository.get_all()

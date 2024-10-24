@@ -1,14 +1,15 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-
 from otaku_back.database.repository import Repository
 from otaku_back.database.schemas.serializers import UserSerializer
 from otaku_back.database.schemas.user import User
+from otaku_back.security.permissions import UserPermission
 
 
 class UserViewSet(viewsets.ViewSet):
     serializer_class = UserSerializer
     repository = Repository(User)
+    permission_classes = [UserPermission]
 
     def list(self, request):
         users = self.repository.get_all()

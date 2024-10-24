@@ -4,11 +4,13 @@ from rest_framework.response import Response
 from otaku_back.database.repository import Repository
 from otaku_back.database.schemas.serializers import AnimeSerializer
 from otaku_back.database.schemas.title import Anime
+from otaku_back.security.permissions import AdminPermission
 
 
 class AnimeViewSet(viewsets.ViewSet):
     serializer_class = AnimeSerializer
     repository = Repository(Anime)
+    permission_classes = [AdminPermission]
 
     def list(self, request):
         animes = self.repository.get_all()

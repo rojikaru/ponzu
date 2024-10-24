@@ -26,7 +26,7 @@ REST_FRAMEWORK = {
         'otaku_back.security.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'otaku_back.security.permissions.CreateUserPermission',
+        'otaku_back.security.permissions.NoAuthPermission',
     ),
     'DEFAULT_SERIALIZER_CLASSES': {
         'TokenObtainPairSerializer': 'otaku_back.database.schemas.serializers.AuthSerializer',
