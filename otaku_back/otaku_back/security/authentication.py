@@ -13,10 +13,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
         if not auth_header or auth_header[0].lower() != b'bearer':
             return None
 
-        if len(auth_header) == 1:
-            raise exceptions.AuthenticationFailed('Invalid token header. No credentials provided.')
-        elif len(auth_header) > 2:
-            raise exceptions.AuthenticationFailed('Invalid token header. Token string should not contain spaces.')
+        if len(auth_header) != 2:
+            raise exceptions.AuthenticationFailed('Invalid token header')
 
         try:
             token = auth_header[1]
@@ -31,18 +29,21 @@ class JWTAuthentication(authentication.BaseAuthentication):
         except User.DoesNotExist:
             raise exceptions.AuthenticationFailed('User not found.')
 
-        return (user, None)
+        return user, None
 
 
 class UserBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None):
         try:
             user = User.objects.get(username=username)
-            if user and check_password(password, user.password):
+            password_matches = check_password(password, user.password)
+            if user and password_matches:
                 return user
-        except User.DoesNotExist:
+            else:
+                raise Exception()
+        except Exception as e:
+            check_password(None, None)
             return None
-        return None
 
     def get_user(self, user_id):
         try:
