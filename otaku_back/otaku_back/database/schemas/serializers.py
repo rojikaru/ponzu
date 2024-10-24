@@ -53,7 +53,7 @@ class AnimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Anime
         fields = '__all__'
-    
+
 
 class MangaSerializer(serializers.ModelSerializer):
     genres = GenreSerializer(many=True)
@@ -140,6 +140,7 @@ class AuthSerializer(serializers.Serializer):
 
         return {
             'access_token': access_token,
+            'token_type': 'Bearer',
             'refresh_token': refresh_token
         }
 
@@ -202,10 +203,12 @@ class AuthSerializer(serializers.Serializer):
             'exp': datetime.utcnow() + timedelta(days=7),
             'iat': datetime.utcnow()
         }
+
         access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm='HS256')
         new_refresh_token = jwt.encode(refresh_payload, settings.SECRET_KEY, algorithm='HS256')
 
         return {
             'access_token': access_token,
+            'token_type': 'Bearer',
             'refresh_token': new_refresh_token
         }
