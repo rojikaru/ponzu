@@ -41,6 +41,7 @@ router.register(r'review/manga', MangaReviewViewSet, basename='manga_review')
 router.register(r'auth', AuthViewSet, basename='auth')
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('', include('django_otaku_front.urls')),
 ]
 
 if ENVIRON('DEBUG'):
