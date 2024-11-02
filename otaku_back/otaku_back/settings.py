@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'djongo',
     'otaku_back',
+    'django_otaku_front',
 ]
 
 REST_FRAMEWORK = {
@@ -60,7 +61,7 @@ ROOT_URLCONF = 'otaku_back.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'otaku_back/django_otaku_front/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
