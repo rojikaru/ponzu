@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'djongo',
     'otaku_back',
     'django_otaku_front',
+    'compressor',
 ]
 
 REST_FRAMEWORK = {
@@ -102,6 +103,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+COMPRESS_ROOT = str(BASE_DIR / 'static') 
+
+COMPRESS_ENABLED = True
+
+STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
