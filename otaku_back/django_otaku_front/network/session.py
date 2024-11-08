@@ -16,13 +16,22 @@ def get_session(session_id):
     return session_store.get(session_id)
 
 
-def set_access_token(session, token):
+def set_session_auth(request, session_id, access_token, refresh_token):
+    request.session['access_token'] = access_token
+    request.session['refresh_token'] = refresh_token
+    request.session['session_id'] = session_id
+    
+    session = get_session(session_id)
     session.headers.update({
-        'Authorization': f'Bearer {token}'
+        'Authorization': f'Bearer {access_token}'
     })
 
 
-def delete_tokens(session):
+def delete_tokens(session_id):
+    session = get_session(session_id)
+    if session is None:
+        return
+    
     if 'Authorization' in session.headers:
         del session.headers['Authorization']
     if 'Refresh-Token' in session.headers:

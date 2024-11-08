@@ -6,7 +6,9 @@ class TokenAuthMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.user = get_user()
+        session_id = request.session.get('session_id')
+        if session_id:
+            request.user = get_user(session_id)
 
         # Process the request
         return self.get_response(request)

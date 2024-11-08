@@ -5,7 +5,7 @@
         </div>
         <nav class="flex space-x-4">
             <a href="{% url 'home' %}" class="text-gray-300 hover:text-white">Home</a>
-            {% if user %}
+            {% if not user.is_anonymous %}
                 <a href="{% url 'logout' %}" class="text-gray-300 hover:text-white">Logout</a>
             {% else %}
                 <a href="{% url 'login' %}" class="text-gray-300 hover:text-white">Login</a>
