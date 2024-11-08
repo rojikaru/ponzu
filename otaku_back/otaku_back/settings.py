@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_otaku_front.middleware.TokenAuthMiddleware',
 ]
 
 ROOT_URLCONF = 'otaku_back.urls'

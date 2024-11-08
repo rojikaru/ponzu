@@ -9,8 +9,8 @@
         <div class="w-full max-w-xs">
             <form method="post" class="bg-gray-300 shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 {% csrf_token %}
-                <h1 class="text-xl font-bold mb-4">{{ title }}</h1>
-                <p class="mb-4">{{ description }}</p>
+                <h1 class="text-xl font-bold mb-4">Login</h1>
+                <p class="mb-4">Enter your credentials to log in.</p>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
                         Username
@@ -32,12 +32,3 @@
         </div>
     </div>
 {% endblock content %}
-
-{% block scripts %}
-    {% if request.session.refresh_token %}
-        <script>
-            localStorage.setItem('refresh_token', '{{ request.session.refresh_token }}');
-            window.location.href = '/';
-        </script>
-    {% endif %}
-{% endblock scripts %}

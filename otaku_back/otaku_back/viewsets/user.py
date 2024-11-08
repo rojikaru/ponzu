@@ -1,4 +1,6 @@
+from django.contrib.auth.models import AnonymousUser
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from otaku_back.database.repository import Repository
 from otaku_back.database.schemas.serializers import UserSerializer
@@ -10,6 +12,15 @@ class UserViewSet(viewsets.ViewSet):
     serializer_class = UserSerializer
     repository = Repository(User)
     permission_classes = [UserPermission]
+
+    @action(detail=False, methods=['get'], url_path='me')
+    def me(self, request):
+        if not request.user or request.user.is_anonymous:
+            return Response(status=401)
+        print(request.user)
+        user = self.repository.get_by_id(request.user.id)
+        serializer = self.serializer_class(user)
+        return Response(serializer.data)
 
     def list(self, request):
         users = self.repository.get_all()

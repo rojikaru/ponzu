@@ -1,15 +1,14 @@
 ﻿from django.shortcuts import render
 from django.views.generic import TemplateView
 from django_otaku_front.forms.register import RegisterForm
-from django_otaku_front.network.request_session import create_session, get_session, set_access_token, get_full_url, delete_tokens
+from django_otaku_front.network.session import create_session, get_session, set_access_token, delete_tokens
+from django_otaku_front.network.helper import get_full_url
 
 class RegisterView(TemplateView):
     template_name = 'register.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Register'
-        context['description'] = 'Create a new account.'
         context['form'] = RegisterForm()
         return context
 
