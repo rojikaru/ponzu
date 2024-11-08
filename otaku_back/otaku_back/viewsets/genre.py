@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 from otaku_back.database.repository import Repository
 from otaku_back.database.schemas.genre import Genre
-from otaku_back.database.schemas.serializers import GenreSerializer
+from otaku_back.database.serializers import GenreSerializer
 from otaku_back.security.permissions import AdminPermission
 
 

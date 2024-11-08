@@ -2,7 +2,6 @@ from typing import List, Optional
 
 from django.core.exceptions import BadRequest
 from django.db import models
-from rest_framework import status
 
 
 class Repository[T: models.Model]:

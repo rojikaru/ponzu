@@ -1,7 +1,7 @@
 ﻿from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from otaku_back.database.schemas.serializers import AuthSerializer
+from otaku_back.database.serializers import AuthSerializer
 from otaku_back.security.permissions import NoAuthPermission
 
 

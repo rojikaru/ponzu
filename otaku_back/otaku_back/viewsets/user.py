@@ -1,9 +1,9 @@
-from django.contrib.auth.models import AnonymousUser
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from otaku_back.database.repository import Repository
-from otaku_back.database.schemas.serializers import UserSerializer
+from otaku_back.database.serializers import UserSerializer
 from otaku_back.database.schemas.user import User
 from otaku_back.security.permissions import UserPermission
 
