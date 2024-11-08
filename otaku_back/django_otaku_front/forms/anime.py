@@ -64,6 +64,7 @@ class ImagesField(forms.Field):
 
 
 class AnimeCreateForm(forms.Form):
+    mal_id = forms.IntegerField(min_value=1, required=True)
     title = forms.CharField(required=True)
     title_english = forms.CharField(required=False)
     title_japanese = forms.CharField(required=False)

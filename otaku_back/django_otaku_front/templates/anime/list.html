@@ -5,7 +5,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mx-8">
         {% for anime in animes %}
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <img src="{{ anime.images.jpg.image_url }}" alt="{{ anime.title }}" class="w-full h-48 object-cover">
+                <img src="{{ anime.images.webp.image_url }}" alt="{{ anime.title }}" class="w-full h-48 object-cover">
                 <div class="p-4">
                     <h2 class="text-xl font-semibold mb-2">
                         <a class="hover:text-blue-700 active:text-blue-800" href="{% url 'anime_detail' anime.mal_id %}">
