@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+    @apply bg-blue-200;
+}
 .container {
     @apply mx-auto max-w-[1440px];
 }
