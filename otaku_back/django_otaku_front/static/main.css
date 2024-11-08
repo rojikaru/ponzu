@@ -5,6 +5,15 @@
 body {
     @apply bg-blue-200;
 }
+
 .container {
     @apply mx-auto max-w-[1440px];
+}
+
+.styled-form {
+    @apply flex flex-col gap-6 w-1/3 mx-auto;
+    
+    & p {
+        @apply flex flex-col;
+    }
 }
