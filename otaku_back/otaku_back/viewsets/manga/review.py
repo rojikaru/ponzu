@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 from otaku_back.database.repository import Repository
 from otaku_back.database.schemas.review import MangaReview
-from otaku_back.database.schemas.serializers import MangaReviewSerializer
+from otaku_back.database.serializers import MangaReviewSerializer
 from otaku_back.security.permissions import UserPermission
 
 

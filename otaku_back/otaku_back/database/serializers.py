@@ -1,19 +1,17 @@
 from datetime import datetime, timedelta
-from uuid import uuid4
 
 import jwt
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
-from .genre import Genre
-from .demographic import Demographic
-from .producer import Producer
-from .title import Anime, Manga
-from .review import AnimeReview, MangaReview
-
-from .user import User
-from ... import settings
 from otaku_back.security.authentication import UserBackend
+from otaku_back.database.schemas.demographic import Demographic
+from otaku_back.database.schemas.genre import Genre
+from otaku_back.database.schemas.producer import Producer
+from otaku_back.database.schemas.review import AnimeReview, MangaReview
+from otaku_back.database.schemas.title import Anime, Manga
+from otaku_back.database.schemas.user import User
+from otaku_back import settings
 
 
 class JSONSerializerField(serializers.Field):
