@@ -6,7 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <title>OtakuRank</title>
+    <title>
+        {% if title is None %}
+            OtakuRank
+        {% else %}
+            {{ title }}
+        {% endif %}
+    </title>
     {% compress css %}
         <link rel="stylesheet" href="{% static 'main.min.css' %}">
     {% endcompress %}
@@ -15,7 +21,7 @@
 </head>
 <body>
 {% include 'header.html' %}
-<main class="container mt-16">
+<main class="container mt-20">
     {% block content %}
     {% endblock content %}
 </main>
