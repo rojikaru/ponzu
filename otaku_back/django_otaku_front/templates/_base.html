@@ -4,7 +4,8 @@
     {% load compress %}
     {% load static %}
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>OtakuRank</title>
     {% compress css %}
         <link rel="stylesheet" href="{% static 'main.min.css' %}">
@@ -14,14 +15,11 @@
 </head>
 <body>
 {% include 'header.html' %}
-<div class="container mt-16">
-    {% block content %} 
+<main class="container mt-16">
+    {% block content %}
     {% endblock content %}
-</div>
+</main>
+{% block scripts %}
+{% endblock scripts %}
 </body>
-    {% compress js %}
-        <script src="{% static 'auth.js' %}"></script>
-    {% endcompress %}
-    {% block scripts %}
-    {% endblock scripts %}
 </html>

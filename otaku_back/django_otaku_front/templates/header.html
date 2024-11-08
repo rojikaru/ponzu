@@ -5,8 +5,12 @@
         </div>
         <nav class="flex space-x-4">
             <a href="{% url 'home' %}" class="text-gray-300 hover:text-white">Home</a>
-            <button id="login" class="text-gray-300 hover:text-white">Login</button>
-            <button id="register" class="text-gray-300 hover:text-white">Register</button>
+            {% if user %}
+                <a href="{% url 'logout' %}" class="text-gray-300 hover:text-white">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="text-gray-300 hover:text-white">Login</a>
+                <a href="{% url 'register' %}" class="text-gray-300 hover:text-white">Register</a>
+            {% endif %}
         </nav>
     </div>
 </header>

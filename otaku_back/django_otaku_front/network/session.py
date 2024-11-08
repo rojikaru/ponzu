@@ -1,9 +1,6 @@
 ﻿import requests
 from uuid import uuid4
 
-from otaku_back.env import ENVIRON
-
-BASE_URL = ENVIRON('API_URL')
 
 session_store = {}
 
@@ -30,7 +27,3 @@ def delete_tokens(session):
         del session.headers['Authorization']
     if 'Refresh-Token' in session.headers:
         del session.headers['Refresh-Token']
-
-
-def get_full_url(endpoint):
-    return f'{BASE_URL}{endpoint}'
