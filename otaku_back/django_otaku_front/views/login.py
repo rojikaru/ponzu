@@ -1,7 +1,7 @@
-﻿from django.shortcuts import render, redirect
+﻿from django.shortcuts import render
 from django.views.generic import TemplateView
 from django_otaku_front.forms.login import LoginForm
-from django_otaku_front.request_session import create_session, get_session, set_access_token, get_full_url, delete_tokens
+from django_otaku_front.network.request_session import create_session, get_session, set_access_token, get_full_url, delete_tokens
 
 class LoginView(TemplateView):
     template_name = 'login.html'
