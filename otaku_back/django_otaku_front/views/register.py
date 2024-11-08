@@ -1,7 +1,8 @@
 ﻿from django.shortcuts import render
 from django.views.generic import TemplateView, RedirectView
+
 from django_otaku_front.forms.register import RegisterForm
-from django_otaku_front.network.helper import get_full_url, register
+from django_otaku_front.network.helper import register
 
 
 class RegisterView(TemplateView):
@@ -10,6 +11,7 @@ class RegisterView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = RegisterForm()
+        context['title'] = 'Register'
         return context
 
     def post(self, request, *args, **kwargs):

@@ -1,7 +1,8 @@
 ﻿from django.shortcuts import render
 from django.views.generic import TemplateView, RedirectView
+
 from django_otaku_front.forms.login import LoginForm
-from django_otaku_front.network.helper import get_full_url, login
+from django_otaku_front.network.helper import login
 
 
 class LoginView(TemplateView):
@@ -10,6 +11,7 @@ class LoginView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = LoginForm()
+        context['title'] = 'Login'
         return context
 
     def post(self, request, *args, **kwargs):
@@ -27,5 +29,5 @@ class LoginView(TemplateView):
             return render(
                 request,
                 self.template_name,
-                {'form': form, 'title': 'Login', 'description': 'Please enter your credentials to log in.'}
+                {'form': form, 'title': 'Login', 'description': 'Wrong credentials. Please try again.'}
             )
