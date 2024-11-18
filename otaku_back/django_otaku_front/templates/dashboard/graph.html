@@ -1,0 +1,13 @@
+﻿{% extends "dashboard/_base.html" %}
+
+{% block dashboard_content %}
+    {% include "dashboard/navigation.html" %}
+    <div class="w-full md:w-3/4 ml-0 md:ml-4">
+        <div id="graph-container" class="bg-white p-4 shadow rounded">
+            {% if graph %}
+                <p class="text-3xl mb-4">{{ graph.title }}</p>
+                <img src="{{ graph.image }}" alt="{{ graph.title }}" class="w-full h-auto object-cover">
+            {% endif %}
+        </div>
+    </div>
+{% endblock dashboard_content %}

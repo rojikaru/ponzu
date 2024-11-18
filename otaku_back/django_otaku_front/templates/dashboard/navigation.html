@@ -1,0 +1,11 @@
+﻿<aside class="w-full md:w-1/4 bg-blue-300 p-4 rounded">
+    <ul>
+        {% for graph in graphs %}
+            <li>
+                <a href="/dashboard/{{ version }}/{{ graph.path }}" class="block py-2 px-4 text-blue-600 hover:bg-blue-400 rounded flex items-center">
+                    {{ graph.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</aside>

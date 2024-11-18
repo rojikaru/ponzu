@@ -1,0 +1,16 @@
+﻿{% extends "dashboard/_base.html" %}
+
+{% block dashboard_content %}
+    <div class="w-full md:w-1/4 p-4">
+        <p class="mb-2">Choose graph from the list:</p>
+        <ul>
+            {% for graph in graphs %}
+                <li>
+                    <a href="{{ graph.path }}" class="block py-2 px-4 text-blue-600 hover:bg-blue-300 rounded flex items-center">
+                        {{ graph.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock dashboard_content %}
