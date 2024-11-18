@@ -107,3 +107,24 @@ def get_anime_list(session_id):
 
     response = session.get(get_full_url('anime'))
     return response.json()
+
+def get_dashboard_version_list(session_id):
+    return ['v1', 'v2']
+
+
+def get_anime_graph(session_id, version, graph_slug):
+    session = get_session(session_id)
+    if session is None:
+        return None
+
+    response = session.get(get_full_url(f'graph/anime/{version}/{graph_slug}'))
+    return response.json()
+
+
+def get_anime_graph_list(session_id, version):
+    session = get_session(session_id)
+    if session is None:
+        return None
+
+    response = session.get(get_full_url(f'graph/anime/{version}'))
+    return response.json()    
