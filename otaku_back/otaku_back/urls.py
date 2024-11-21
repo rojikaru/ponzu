@@ -19,6 +19,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .env import ENVIRON
+from .viewsets.analytics.anime import AnimeAnalyticsViewSet
 from .viewsets.auth import AuthViewSet
 from .viewsets.demographic import DemographicViewSet
 from .viewsets.genre import GenreViewSet
@@ -29,21 +30,32 @@ from .viewsets.manga.title import MangaViewSet
 from .viewsets.anime.review import AnimeReviewViewSet
 from .viewsets.manga.review import MangaReviewViewSet
 
+# Create a router and register our viewsets with it.
 router = DefaultRouter()
-router.register(r'demographic', DemographicViewSet, basename='demographic')
+
+# User viewsets
+router.register(r'auth', AuthViewSet, basename='auth')
 router.register(r'user', UserViewSet, basename='user')
+
+# Anime and Manga viewsets
+router.register(r'demographic', DemographicViewSet, basename='demographic')
 router.register(r'anime', AnimeViewSet, basename='anime')
 router.register(r'manga', MangaViewSet, basename='manga')
 router.register(r'genre', GenreViewSet, basename='genre')
 router.register(r'producer', ProducerViewSet, basename='producer')
 router.register(r'review/anime', AnimeReviewViewSet, basename='anime_review')
 router.register(r'review/manga', MangaReviewViewSet, basename='manga_review')
-router.register(r'auth', AuthViewSet, basename='auth')
+
+# Analytics viewsets
+router.register(r'analytics/anime', AnimeAnalyticsViewSet, basename='analytics_anime')
+
+# URL configuration for otaku_back project.
 urlpatterns = [
-    path('api/', include(router.urls)),
-    path('', include('django_otaku_front.urls')),
+    path('api/', include(router.urls)),             # Backend routes
+    path('', include('django_otaku_front.urls')),   # Frontend routes
 ]
 
+# Enable Django admin if DEBUG mode is enabled
 if ENVIRON('DEBUG'):
     print('DEBUG MODE ENABLED')
     urlpatterns.append(path('admin/', admin.site.urls))
