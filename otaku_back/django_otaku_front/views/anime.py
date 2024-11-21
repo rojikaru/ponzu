@@ -18,7 +18,7 @@ class AnimeView(TemplateView):
 
 
 def anime_delete(request, **kwargs):
-    anime = delete_anime(request.session.get('session_id'), kwargs['pk'])
+    is_ok = delete_anime(request.session.get('session_id'), kwargs['pk'])
     return redirect('anime_list')
 
 

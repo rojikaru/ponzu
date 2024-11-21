@@ -79,7 +79,7 @@ def delete_anime(session_id, anime_id):
         return None
 
     response = session.delete(get_full_url(f'anime/{anime_id}'))
-    return response.json()
+    return response.ok
 
 
 def create_anime(session_id, data):
