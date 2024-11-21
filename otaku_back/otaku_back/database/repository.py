@@ -9,7 +9,7 @@ class Repository[T: models.Model]:
         self._model = model
 
     def get_all(self) -> List[T]:
-        return self._model.objects.all()
+        return list(self._model.objects.all())
 
     def get_by_id(self, instance_id) -> Optional[T]:
         try:
