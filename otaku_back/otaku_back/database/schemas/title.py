@@ -1,4 +1,5 @@
-from djongo import models
+from typing import Annotated
+from beanie import Document, Indexed
 
 from .demographic import Demographic
 from .genre import Genre
@@ -6,43 +7,45 @@ from .producer import Producer
 
 
 # We'll follow the same structure as Jikan API
-class Title(models.Model):
-    class Meta:
-        abstract = True
+class Title(Document):
+    mal_id: Annotated[int, Indexed(unique=True)]
 
-    mal_id = models.PositiveBigIntegerField(primary_key=True)
+    title: str
+    title_english: str
+    title_japanese: str
+    title_synonyms: list[str]
+    # titles: list[dict]
 
-    title = models.TextField()
-    title_english = models.TextField()
-    title_japanese = models.TextField()
-    title_synonyms = models.JSONField()
-    # titles = models.ArrayField(models.JSONField)
+    type: str
+    episodes: int
+    genres: list[Genre]
+    demographics: list[Demographic]
+    synopsis: str
 
-    type = models.TextField()
-    episodes = models.PositiveIntegerField()
-    genres = models.ManyToManyField(Genre)
-    demographics = models.ManyToManyField(Demographic)
-    synopsis = models.TextField()
+    # aired: dict
+    # airing: bool
+    status: str
+    # duration: str
+    producers: list[Producer]
+    year: int
 
-    # aired = models.JSONField()
-    # airing = models.BooleanField()
-    status = models.TextField()
-    # duration = models.TextField()
-    producers = models.ManyToManyField(Producer)
-    year = models.PositiveIntegerField()
+    score: float
+    rank: int
 
-    score = models.FloatField()
-    rank = models.PositiveIntegerField()
+    images: dict
 
-    images = models.JSONField()
+    class Settings:
+        collection = None
 
     def __str__(self):
         return f'{self.title} ({self.year}, ID: {self.mal_id})'
 
 
 class Anime(Title):
-    pass
+    class Settings:
+        name = "anime"
 
 
 class Manga(Title):
-    pass
+    class Settings:
+        name = "manga"

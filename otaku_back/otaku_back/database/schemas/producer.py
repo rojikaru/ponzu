@@ -1,11 +1,16 @@
-﻿from djongo import models
+﻿from typing import Annotated
+
+from beanie import Document, Indexed
 
 
-class Producer(models.Model):
-    mal_id = models.PositiveBigIntegerField(primary_key=True)
-    name = models.TextField()
-    type = models.TextField()
-    url = models.URLField()
+class Producer(Document):
+    mal_id: Annotated[int, Indexed(unique=True)]
+    name: str
+    type: str
+    url: str
+
+    class Settings:
+        name: str = "producer"
 
     def __str__(self):
         return f'{self.name} ({self.type}, {self.url})'

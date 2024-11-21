@@ -1,10 +1,15 @@
-from djongo import models
+from typing import Annotated
+
+from beanie import Document, Indexed
 
 
-class Demographic(models.Model):
-    mal_id = models.PositiveBigIntegerField(primary_key=True)
-    name = models.TextField()
-    type = models.TextField()
+class Demographic(Document):
+    mal_id: Annotated[int, Indexed(unique=True)]
+    name: str
+    type: str
+
+    class Settings:
+        name: str = "demographic"
 
     def __str__(self):
         return f'{self.name} ({self.type})'
