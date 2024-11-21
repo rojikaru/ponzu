@@ -1,7 +1,8 @@
 import uuid
+
+from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
-from django.db import models
 
 
 class BaseUser(AbstractBaseUser, models.Model):
@@ -52,12 +53,3 @@ class User(BaseUser):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
-
-    def __str__(self):
-        return self.username
-
-    def has_perm(self, perm, obj=None):
-        return self.is_superuser
-
-    def has_module_perms(self, app_label):
-        return self.is_superuser

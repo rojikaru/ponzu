@@ -17,10 +17,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'djongo',
+    'otaku_back.database',
     'otaku_back',
     'django_otaku_front',
     'compressor',
+    'adrf',
 ]
 
 REST_FRAMEWORK = {
@@ -76,19 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'otaku_back.wsgi.application'
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'otaku',
-        'CLIENT': {
-            'host': ENVIRON('DATABASE_URL'),
-            'username': ENVIRON('DATABASE_USER'),
-            'password': ENVIRON('DATABASE_PASSWORD'),
-        }
-    }
-}
+ASGI_APPLICATION = 'otaku_back.asgi.application'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

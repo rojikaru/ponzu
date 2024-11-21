@@ -1,5 +1,4 @@
-﻿from django.shortcuts import redirect, render
-from django.urls import path
+﻿from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from django_otaku_front.network.helper import get_dashboard_version_list, get_anime_graph_list, get_anime_graph

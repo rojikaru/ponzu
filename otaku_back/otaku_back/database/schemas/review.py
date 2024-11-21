@@ -1,33 +1,47 @@
-from djongo import models
-import uuid
+from datetime import datetime
+from typing import Optional
+from uuid import UUID
+
+from beanie import Document, before_event
+from beanie.odm.actions import EventTypes
+from pydantic import Field
+
+from otaku_back.database.schemas.title import Anime, Manga
+from otaku_back.database.schemas.user import User
 
 
-class Review(models.Model):
-    class Meta:
-        abstract = True
+class Review(Document):
+    _id: UUID = Field(default_factory=UUID)
+    user: User
+    score: int
+    content: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
-    _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    @before_event(EventTypes.INSERT)
+    def set_created_at(self):
+        self.created_at = datetime.now()
 
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    @before_event(EventTypes.UPDATE)
+    def set_updated_at(self):
+        self.updated_at = datetime.now()
 
-    # 1-10, Validate in the related service
-    score = models.PositiveSmallIntegerField()
+    class Settings:
+        collection = None
 
-    content = models.TextField()
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f'{self.user} ({self.score}, {self.created_at})'
 
 
 class AnimeReview(Review):
-    class Meta:
-        db_table = 'AnimeReview'
+    class Settings:
+        name = "anime_review"
 
-    anime = models.ForeignKey('Anime', on_delete=models.CASCADE)
+    anime = Anime
 
 
 class MangaReview(Review):
-    class Meta:
-        db_table = 'MangaReview'
+    class Settings:
+        name = "manga_review"
 
-    manga = models.ForeignKey('Manga', on_delete=models.CASCADE)
+    manga = Manga
