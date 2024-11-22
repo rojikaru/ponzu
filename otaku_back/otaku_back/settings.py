@@ -17,7 +17,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'otaku_back.database',
     'otaku_back',
     'django_otaku_front',
     'compressor',
@@ -34,13 +33,21 @@ REST_FRAMEWORK = {
     'DEFAULT_SERIALIZER_CLASSES': {
         'TokenObtainPairSerializer': 'otaku_back.database.schemas.serializers.AuthSerializer',
     },
+    'EXCEPTION_HANDLER': 'otaku_back.security.exceptions.handlers.api_exception_handler',
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'USER_ID_FIELD': '_id',
-    'USER_ID_CLAIM': 'user_id',
+    'USER_ID_CLAIM': 'sub',
+}
+
+DATABASES = {
+    'default': {
+        # Dummy engine, because we don't need relational DB
+        'ENGINE': 'django.db.backends.dummy',
+    }
 }
 
 AUTHENTICATION_BACKENDS = [
