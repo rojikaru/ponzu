@@ -1,42 +1,38 @@
-from rest_framework import viewsets
+from adrf.viewsets import ViewSet
 from rest_framework.response import Response
 
 from otaku_back.database.repository import Repository
 from otaku_back.database.serializers import AnimeSerializer
 from otaku_back.database.schemas.title import Anime
 from otaku_back.security.permissions import AdminPermission
+from otaku_back.json.helper import JsonConverter
 
 
-class AnimeViewSet(viewsets.ViewSet):
-    serializer_class = AnimeSerializer
+class AnimeViewSet(ViewSet):
     repository = Repository(Anime)
     permission_classes = [AdminPermission]
 
-    def list(self, request):
-        animes = self.repository.get_all()
-        serializer = self.serializer_class(animes, many=True)
-        return Response(serializer.data)
+    async def list(self, request):
+        animes = await self.repository.get_all()
+        return Response(JsonConverter.convert_to_jsonable(animes))
 
-    def retrieve(self, request, pk=None):
-        anime = self.repository.get_by_id(pk)
+    async def retrieve(self, request, pk=None):
+        anime = await self.repository.get_by_id(pk)
         if not anime:
             return Response(status=404)
-        serializer = self.serializer_class(anime)
-        return Response(serializer.data)
+        return Response(JsonConverter.convert_to_jsonable(anime))
 
-    def create(self, request):
-        anime = self.repository.create(**request.data)
-        serializer = self.serializer_class(anime)
-        return Response(serializer.data, status=201)
+    async def create(self, request):
+        anime = await self.repository.create(**request.data)
+        return Response(JsonConverter.convert_to_jsonable(anime), status=201)
 
-    def partial_update(self, request, pk=None):
-        anime = self.repository.update(pk, **request.data)
+    async def partial_update(self, request, pk=None):
+        anime = await self.repository.update(pk, **request.data)
         if not anime:
             return Response(status=404)
-        serializer = self.serializer_class(anime)
-        return Response(serializer.data)
+        return Response(JsonConverter.convert_to_jsonable(anime))
 
-    def destroy(self, request, pk=None):
-        if self.repository.delete(pk):
+    async def destroy(self, request, pk=None):
+        if await self.repository.delete(pk):
             return Response(status=204)
         return Response(status=404)

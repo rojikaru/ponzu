@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from adrf.viewsets import ViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -8,7 +8,7 @@ from otaku_back.database.schemas.title import Anime
 from otaku_back.env import ENVIRON
 
 
-class AnimeAnalyticsViewSet(viewsets.ViewSet):
+class AnimeAnalyticsViewSet(ViewSet):
     anime_repository = Repository(Anime)
     review_repository = Repository(AnimeReview)
 
@@ -21,7 +21,7 @@ class AnimeAnalyticsViewSet(viewsets.ViewSet):
         },
         {
             'name': 'top_rated',
-            'friendly_name': 'Top Rated',
+            'friendly_name': 'Top-Rated',
             'url': api_url + 'analytics/anime/top-rated',
         },
         {
@@ -60,7 +60,7 @@ class AnimeAnalyticsViewSet(viewsets.ViewSet):
     def most_popular(self, request):
         return Response('most_popular')
 
-    # Returns the aggregated stats of the top rated anime by year
+    # Returns the aggregated stats of the top-rated anime by year
     @action(detail=False, methods=['get'], url_path='top-rated')
     def top_rated(self, request):
         return Response('top_rated')
