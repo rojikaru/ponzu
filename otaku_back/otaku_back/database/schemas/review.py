@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from beanie import Document, before_event
+from beanie import Document, before_event, Link
 from beanie.odm.actions import EventTypes
 from pydantic import Field
 
@@ -11,8 +11,7 @@ from otaku_back.database.schemas.user import User
 
 
 class Review(Document):
-    _id: UUID = Field(default_factory=UUID)
-    user: User
+    user: Link[User]
     score: int
     content: str
     created_at: Optional[datetime] = None
@@ -37,11 +36,11 @@ class AnimeReview(Review):
     class Settings:
         name = "anime_review"
 
-    anime = Anime
+    anime: Anime = Field(alias="anime_id")
 
 
 class MangaReview(Review):
     class Settings:
         name = "manga_review"
 
-    manga = Manga
+    manga: Manga = Field(alias="manga_id")
