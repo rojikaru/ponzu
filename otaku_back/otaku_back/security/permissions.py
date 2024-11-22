@@ -23,10 +23,10 @@ class UserPermission(BasePermission):
 
         if request.user or request.user.is_authenticated:
             if view.basename == 'user' and view.action in ['retrieve', 'update', 'partial_update', 'destroy']:
-                return str(request.user._id) == view.kwargs.get('pk')
+                return str(request.user.id) == view.kwargs.get('pk')
 
             if view.basename in ['anime_review', 'manga_review'] and view.action in ['create', 'update', 'partial_update', 'destroy']:
-                return str(request.user._id) == request.data.get('user')
+                return str(request.user.id) == request.data.get('user')
 
         return False
 
