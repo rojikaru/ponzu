@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 from beanie import Document, Indexed
 
 from .demographic import Demographic
@@ -28,6 +28,8 @@ class Title(Document):
     # duration: str
     producers: List["Producer"]
     year: int
+
+    popularity: Optional[float] = None
 
     score: float
     rank: int

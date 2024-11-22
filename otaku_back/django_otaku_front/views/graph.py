@@ -47,6 +47,8 @@ class GraphViewSet(TemplateView):
             # ]
         )
         print(data)
+        context['url'] = kwargs['graph']
+        context['version'] = kwargs['version']
 
         # selected_start_year = self.request.GET.get('start_year')
         # selected_end_year = self.request.GET.get('end_year')
@@ -78,8 +80,8 @@ class GraphViewSet(TemplateView):
 
 class GraphImageView(View):
     def get(self, request, *args, **kwargs):
-        graph_url = kwargs['url']
-        response = requests.get(graph_url)
+        url = kwargs['graph_url']
+        response = requests.get(url)
         data = response.json()
 
         start_year = int(request.GET.get('start_year', min(data.keys())))

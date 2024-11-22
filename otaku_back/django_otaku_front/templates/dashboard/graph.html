@@ -20,7 +20,7 @@
                         {% endfor %}
                     </select>
                 </form>
-                <img src="{% url 'graph_image' graph.url graph.version %}?start_year={{ selected_start_year }}&end_year={{ selected_end_year }}" alt="{{ graph.title }}" class="w-full h-auto object-cover">
+                <img src="{% url 'graph_image' url version %}?start_year={{ selected_start_year }}&end_year={{ selected_end_year }}" alt="{{ graph.title }}" class="w-full h-auto object-cover">
                 <div class="mt-4">
                     <p>Max Value: {{ max_value }}</p>
                     <p>Min Value: {{ min_value }}</p>
