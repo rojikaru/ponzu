@@ -6,8 +6,8 @@
         <ul>
             {% for graph in graphs %}
                 <li>
-                    <a href="{{ graph.path }}" class="block py-2 px-4 text-blue-600 hover:bg-blue-300 rounded flex items-center">
-                        {{ graph.title }}
+                    <a href="{{ graph.friendly_name }}" class="block py-2 px-4 text-blue-600 hover:bg-blue-300 rounded flex items-center">
+                        {{ graph.name }}
                     </a>
                 </li>
             {% endfor %}

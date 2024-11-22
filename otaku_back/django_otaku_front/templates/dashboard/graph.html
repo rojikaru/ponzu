@@ -6,7 +6,27 @@
         <div id="graph-container" class="bg-white p-4 shadow rounded">
             {% if graph %}
                 <p class="text-3xl mb-4">{{ graph.title }}</p>
-                <img src="{{ graph.image }}" alt="{{ graph.title }}" class="w-full h-auto object-cover">
+                <form method="get">
+                    <label for="start_year">Select Start Year:</label>
+                    <select name="start_year" id="start_year" onchange="this.form.submit()">
+                        {% for year in graph.graph.keys %}
+                            <option value="{{ year }}" {% if year == selected_start_year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="end_year">Select End Year:</label>
+                    <select name="end_year" id="end_year" onchange="this.form.submit()">
+                        {% for year in graph.graph.keys %}
+                            <option value="{{ year }}" {% if year == selected_end_year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <img src="{% url 'graph_image' graph.url graph.version %}?start_year={{ selected_start_year }}&end_year={{ selected_end_year }}" alt="{{ graph.title }}" class="w-full h-auto object-cover">
+                <div class="mt-4">
+                    <p>Max Value: {{ max_value }}</p>
+                    <p>Min Value: {{ min_value }}</p>
+                    <p>Median Value: {{ median_value }}</p>
+                    <p>Average Value: {{ avg_value }}</p>
+                </div>
             {% endif %}
         </div>
     </div>

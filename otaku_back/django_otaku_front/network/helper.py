@@ -117,7 +117,7 @@ def get_anime_graph(session_id, version, graph_slug):
     if session is None:
         return None
 
-    response = session.get(get_full_url(f'graph/anime/{version}/{graph_slug}'))
+    response = session.get(get_full_url(f'analytics/anime/{version}/{graph_slug}'))
     return response.json()
 
 
@@ -126,5 +126,5 @@ def get_anime_graph_list(session_id, version):
     if session is None:
         return None
 
-    response = session.get(get_full_url(f'graph/anime/{version}'))
+    response = session.get(get_full_url(f'analytics/anime/{version}'))
     return response.json()    
