@@ -16,7 +16,7 @@ class UserViewSet(ViewSet):
     async def me(self, request):
         if not request.user:
             return Response(status=401)
-        user = await self.repository.get_by_id(request.user.pk)
+        user = await self.repository.get_by_id(request.user.id)
         return Response(JsonConverter.convert_to_jsonable(user))
 
     async def list(self, request):

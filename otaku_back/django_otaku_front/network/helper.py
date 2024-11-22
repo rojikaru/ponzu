@@ -1,3 +1,5 @@
+from http.client import responses
+
 from django_otaku_front.network.session import set_session_auth, create_session, get_session
 from otaku_back.env import ENVIRON
 
@@ -112,19 +114,26 @@ def get_dashboard_version_list(session_id):
     return ['v1', 'v2']
 
 
-def get_anime_graph(session_id, version, graph_slug):
+def get_anime_graph_data(session_id, graph_slug, pipeline=None):
     session = get_session(session_id)
     if session is None:
         return None
 
-    response = session.get(get_full_url(f'analytics/anime/{version}/{graph_slug}'))
+    if pipeline is None:
+       pipeline = []
+
+    response = session.get(
+        get_full_url(f'analytics/anime/{graph_slug}'),
+        json=pipeline
+    )
     return response.json()
 
 
-def get_anime_graph_list(session_id, version):
+def get_anime_graph_list(session_id):
     session = get_session(session_id)
     if session is None:
         return None
 
-    response = session.get(get_full_url(f'analytics/anime/{version}'))
+    response = session.get(get_full_url(f'analytics/anime'))
+
     return response.json()    

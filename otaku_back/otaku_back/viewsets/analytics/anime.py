@@ -1,88 +1,140 @@
+import json
+
 from adrf.viewsets import ViewSet
+from django.core.exceptions import BadRequest
+from pymongo.errors import OperationFailure
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from otaku_back.database.repository import Repository
-from otaku_back.database.schemas.review import AnimeReview
 from otaku_back.database.schemas.title import Anime
 from otaku_back.env import ENVIRON
 
+import pandas as pd
+
 
 class AnimeAnalyticsViewSet(ViewSet):
-    anime_repository = Repository(Anime)
-    review_repository = Repository(AnimeReview)
+    repository = Repository(Anime)
 
     api_url = ENVIRON('API_URL')
     available_stats = [
         {
-            'name': 'most_popular',
+            'name': 'most-popular',
             'friendly_name': 'Most Popular',
             'url': api_url + 'analytics/anime/most-popular',
         },
         {
-            'name': 'top_rated',
+            'name': 'top-rated',
             'friendly_name': 'Top-Rated',
             'url': api_url + 'analytics/anime/top-rated',
         },
         {
-            'name': 'avg_rating',
+            'name': 'avg-rating',
             'friendly_name': 'Average Rating',
             'url': api_url + 'analytics/anime/avg-rating',
         },
         {
-            'name': 'most_watched',
-            'friendly_name': 'Most Watched',
-            'url': api_url + 'analytics/anime/most-watched',
+            'name': 'titles',
+            'friendly_name': 'Count of titles',
+            'url': api_url + 'analytics/anime/titles',
         },
         {
-            'name': 'most_liked',
-            'friendly_name': 'Most Liked',
-            'url': api_url + 'analytics/anime/most-liked',
+            'name': 'popularity',
+            'friendly_name': 'Annual popularity stats',
+            'url': api_url + 'analytics/anime/popularity',
         },
         {
-            'name': 'most_disliked',
-            'friendly_name': 'Most Disliked',
-            'url': api_url + 'analytics/anime/most-disliked',
+            'name': 'new-shounens',
+            'friendly_name': 'New Shounens',
+            'url': api_url + 'analytics/anime/new-shounens',
         },
-        {
-            'name': 'top_demographic',
-            'friendly_name': 'Top Demographic',
-            'url': api_url + 'analytics/anime/top-demographic',
-        }
     ]
 
+    async def _inner_aggregate(self, body=None):
+        try:
+            pipeline = json.loads(body.decode('utf-8'))
+            return await self.repository.aggregate(pipeline)
+        except Exception as e:
+            return await self.repository.get_all()
+
     # Returns the list of available stats
-    def list(self, request):
+    async def list(self, request):
         return Response(self.available_stats)
-
-    # Returns the aggregated stats of the most popular anime by year
-    @action(detail=False, methods=['get'], url_path='most-popular')
-    def most_popular(self, request):
-        return Response('most_popular')
-
-    # Returns the aggregated stats of the top-rated anime by year
-    @action(detail=False, methods=['get'], url_path='top-rated')
-    def top_rated(self, request):
-        return Response('top_rated')
 
     # Returns the aggregated stats of the average rating of new titles by year
     @action(detail=False, methods=['get'], url_path='avg-rating')
-    def avg_rating(self, request):
-        return Response('avg_rating')
+    async def avg_rating(self, request):
+        matches = await self._inner_aggregate(request)
+        if len(matches) == 0:
+            return Response(status=404)
 
-    # Returns the aggregated stats of the most watched anime by year
-    @action(detail=False, methods=['get'], url_path='most-watched')
-    def most_watched(self, request):
-        return Response('most_watched')
+        df = pd.DataFrame(matches)
+        df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df = df.groupby('year').agg({'rating': 'mean'}).reset_index()
 
-    # Returns the aggregated stats of the most liked anime by year
-    # Uses the like count from the reviews where the score 7 or higher
-    @action(detail=False, methods=['get'], url_path='most-liked')
-    def most_liked(self, request):
-        return Response('most_liked')
+        return Response(df.to_dict(orient='records'))
 
-    # Returns the aggregated stats of the most disliked anime by year
-    # Uses the like count from the reviews where the score 4 or lower
-    @action(detail=False, methods=['get'], url_path='most-disliked')
-    def most_disliked(self, request):
-        return Response('most_disliked')
+    # Returns the aggregated stats of the count of titles by year
+    @action(detail=False, methods=['get'], url_path='titles')
+    async def titles(self, request):
+        matches = await self._inner_aggregate(request)
+        if len(matches) == 0:
+            return Response(status=404)
+
+        df = pd.DataFrame(matches)
+        df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df = df.groupby('year').size().reset_index(name='count')
+
+        return Response(df.to_dict(orient='records'))
+
+    # Returns the aggregated stats of the popularity of titles by year
+    @action(detail=False, methods=['get'], url_path='popularity')
+    async def popularity(self, request):
+        matches = await self._inner_aggregate(request)
+        if len(matches) == 0:
+            return Response(status=404)
+
+        df = pd.DataFrame(matches)
+        df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df = df.groupby('year').agg({'popularity': 'mean'}).reset_index()
+
+        return Response(df.to_dict(orient='records'))
+
+    # Returns the aggregated stats of the top-rated (score>7.5) titles count by year
+    @action(detail=False, methods=['get'], url_path='top-rated')
+    async def top_rated(self, request):
+        matches = await self._inner_aggregate(request)
+        if len(matches) == 0:
+            return Response(status=404)
+
+        df = pd.DataFrame(matches)
+        df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df = df[df['rating'] > 7.5].groupby('year').size().reset_index(name='count')
+
+        return Response(df.to_dict(orient='records'))
+
+    # Returns the aggregated stats of the most popular (pop>7.5) titles count by year
+    @action(detail=False, methods=['get'], url_path='most-popular')
+    async def most_popular(self, request):
+        matches = await self._inner_aggregate(request)
+        if len(matches) == 0:
+            return Response(status=404)
+
+        df = pd.DataFrame(matches)
+        df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df = df[df['popularity'] > 7.5].groupby('year').size().reset_index(name='count')
+
+        return Response(df.to_dict(orient='records'))
+
+    # Returns the aggregated stats of the new shounens by year
+    @action(detail=False, methods=['get'], url_path='new-shounens')
+    async def new_shounens(self, request):
+        matches = await self._inner_aggregate(request)
+        if len(matches) == 0:
+            return Response(status=404)
+
+        df = pd.DataFrame(matches)
+        df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df = df[df['genre'] == 'Shounen'].groupby('year').size().reset_index(name='count')
+
+        return Response(df.to_dict(orient='records'))
