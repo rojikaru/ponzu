@@ -3,7 +3,7 @@ from typing import List, Optional, Type, Dict, Any
 import beanie.exceptions
 from beanie import Document, PydanticObjectId
 from django.core.exceptions import BadRequest
-from pydantic import BaseModel
+from pymongo.errors import DuplicateKeyError
 from rest_framework.exceptions import APIException
 
 
@@ -23,7 +23,7 @@ class Repository[T: Document]:
             return None
 
     async def find_by_field(self, field: str, value: Any) -> Optional[T]:
-        if field == '_id':
+        if field == 'id':
             Repository._check_mongo_id(value)
 
         try:
@@ -42,13 +42,16 @@ class Repository[T: Document]:
     async def create(self, **kwargs) -> T:
         Repository._ensure_kwargs_have_no_id(kwargs)
 
-        # Check if the document exists
-        if await self.exists(kwargs.get('_id')):
-            raise APIException(f'{self._model.__name__} already exists', code=409)
+        try:
+            # Check if the document exists
+            if await self.exists(kwargs.get('id')):
+                raise APIException(f'{self._model.__name__} already exists', code=409)
 
-        instance = self._model(**kwargs)
-        await instance.insert()
-        return instance
+            instance = self._model(**kwargs)
+            await instance.insert()
+            return instance
+        except DuplicateKeyError as e:
+            raise APIException(f'{self._model.__name__} already exists', code=409)
 
     async def update(self, instance_id: PydanticObjectId, **kwargs) -> Optional[T]:
         Repository._ensure_kwargs_have_no_id(kwargs)
@@ -90,38 +93,12 @@ class Repository[T: Document]:
         return await self._model.aggregate(kwargs).to_list()
 
     @staticmethod
-    def _check_mongo_id(instance_id: PydanticObjectId):
-        if not isinstance(instance_id, PydanticObjectId):
-            raise BadRequest("Invalid ObjectId")
+    def _check_mongo_id(instance_id: Any):
+        if not PydanticObjectId.is_valid(instance_id):
+            raise BadRequest(f"Invalid _id: {instance_id}")
 
     @staticmethod
     def _ensure_kwargs_have_no_id(kwargs: Dict[str, Any]):
-        if '_id' in kwargs:
+        if 'id' in kwargs:
             raise BadRequest("Cannot merge a new _id")
-
-    def _get_related_fields(self) -> List[str]:
-        """
-        Get a list of related fields (Reference fields).
-        """
-        related_fields = []
-        for field in self._model.__annotations__:
-            if isinstance(self._model.__annotations__[field], type) and issubclass(self._model.__annotations__[field], BaseModel):
-                related_fields.append(field)
-        return related_fields
-
-    async def _handle_related_fields(self, instance, related_data: Dict[str, Any]):
-        # Beanie uses references for related fields, so we need to handle them accordingly
-        for field, related_value in related_data.items():
-            if isinstance(related_value, list):
-                # Handle many-to-many relationships (e.g., storing references)
-                related_model = self._model.__annotations__[field]
-                related_instances = await related_model.find({"_id": {"$in": related_value}}).to_list()
-                setattr(instance, field, related_instances)
-            else:
-                # Handle foreign keys (Reference to another document)
-                related_model = self._model.__annotations__[field]
-                related_instance = await related_model.get(related_value)
-                setattr(instance, field, related_instance)
-
-        await instance.save()
-        return instance
+    
