@@ -14,7 +14,7 @@ class UserViewSet(ViewSet):
 
     @action(detail=False, methods=['get'], url_path='me')
     async def me(self, request):
-        if not request.user or request.user.is_anonymous:
+        if not request.user:
             return Response(status=401)
         user = await self.repository.get_by_id(request.user.pk)
         return Response(JsonConverter.convert_to_jsonable(user))

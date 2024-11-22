@@ -134,3 +134,5 @@ GitHub.sublime-settings
 
 # Package lock
 package-lock.json
+
+*.sqlite3
