@@ -7,10 +7,6 @@ from rest_framework.exceptions import APIException
 
 
 def api_exception_handler(exc, context):
-    # Log the exception
-    logging.error(exc)
-    logging.error(traceback.format_exc())
-
     if isinstance(exc, APIException):
         status = exc.status_code
         message = exc.detail
@@ -24,6 +20,10 @@ def api_exception_handler(exc, context):
         status = 404
         message = 'Not Found'
     else:
+        # Log the exception
+        logging.error(exc)
+        logging.error(traceback.format_exc())
+
         status = 500
         message = 'Internal Server Error'
 

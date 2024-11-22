@@ -14,12 +14,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
     'otaku_back',
     'django_otaku_front',
-    'compressor',
     'adrf',
 ]
 
@@ -45,8 +43,8 @@ SIMPLE_JWT = {
 
 DATABASES = {
     'default': {
-        # Dummy engine, because we don't need relational DB
-        'ENGINE': 'django.db.backends.dummy',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'django.sqlite3',
     }
 }
 
@@ -100,13 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-STATIC_URL = 'django_otaku_front/static/'
-COMPRESS_ROOT = str(BASE_DIR / STATIC_URL)
-
-COMPRESS_ENABLED = True
-
-STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
