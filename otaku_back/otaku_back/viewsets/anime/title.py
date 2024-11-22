@@ -2,7 +2,6 @@ from adrf.viewsets import ViewSet
 from rest_framework.response import Response
 
 from otaku_back.database.repository import Repository
-from otaku_back.database.serializers import AnimeSerializer
 from otaku_back.database.schemas.title import Anime
 from otaku_back.security.permissions import AdminPermission
 from otaku_back.json.helper import JsonConverter
