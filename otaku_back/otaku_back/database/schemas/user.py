@@ -1,55 +1,57 @@
-import uuid
+from typing import Optional
+from datetime import datetime, timezone
+from pydantic import BaseModel, EmailStr, Field
+from beanie import Document, Indexed
+from passlib.context import CryptContext
 
-from django.db import models
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.hashers import make_password
+# Passlib context for password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class BaseUser(AbstractBaseUser, models.Model):
-    class Meta:
-        abstract = True
+# Base User model for common methods and attributes
+class BaseUser(Document):
+    username: str
+    email: Indexed(EmailStr, unique=True)
+    password: str  # Hashed
+    is_active: bool = Field(default=True)
+    is_staff: bool = Field(default=False)
+    is_superuser: bool = Field(default=False)
 
-    def __str__(self):
+    class Settings:
+        name = "users"
+
+    def __str__(self) -> str:
         return self.username
 
-    def has_perm(self, perm, obj=None):
+    def has_perm(self, perm: Optional[str] = None, obj: Optional[BaseModel] = None) -> bool:
         return self.is_superuser
 
-    def has_module_perms(self, app_label):
+    def has_module_perms(self, app_label: str) -> bool:
         return self.is_superuser
 
+    @staticmethod
+    def hash_password(password: str) -> str:
+        return pwd_context.hash(password)
 
-class UserManager(BaseUserManager):
-    def create_user(self, email, username, password=None, **extra_fields):
-        if not email:
-            raise ValueError('The Email field must be set')
-        email = self.normalize_email(email)
-        user = self.model(email=email, username=username, **extra_fields)
-        user.password = make_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, username, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, username, password, **extra_fields)
+    def verify_password(self, password: str) -> bool:
+        return pwd_context.verify(password, self.password)
 
 
+# User model with additional fields
 class User(BaseUser):
-    _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    username = models.TextField()
-    password = models.TextField()  # Hashed, ofc
-    email = models.EmailField()
-    image = models.TextField()
-    bio = models.TextField()
-    birth_date = models.DateField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    image: Optional[str] = None
+    bio: Optional[str] = None
+    birth_date: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    objects = UserManager()
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    @classmethod
+    async def update_user(cls, user_id: str, **kwargs):
+        user = await cls.get(user_id)
+        if not user:
+            raise ValueError("User not found")
+        for key, value in kwargs.items():
+            setattr(user, key, value)
+        user.updated_at = datetime.now(timezone.utc)
+        await user.save_changes()
+        return user
