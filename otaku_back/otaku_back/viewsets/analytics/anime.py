@@ -1,4 +1,5 @@
 import json
+import logging
 
 from adrf.viewsets import ViewSet
 from django.core.exceptions import BadRequest
@@ -52,10 +53,20 @@ class AnimeAnalyticsViewSet(ViewSet):
 
     async def _inner_aggregate(self, body=None):
         try:
+            if not body:
+                return await self.repository.get_all()
+
             pipeline = json.loads(body.decode('utf-8'))
+            if not isinstance(pipeline, list):
+                raise BadRequest("Pipeline should be a list")
+
             return await self.repository.aggregate(pipeline)
+        except json.JSONDecodeError:
+            raise BadRequest("Invalid JSON in request body")
         except Exception as e:
-            return await self.repository.get_all()
+            # Log the exact error for debugging
+            logging.exception(f"Error in _inner_aggregate: {e}")
+            raise BadRequest(str(e))
 
     # Returns the list of available stats
     async def list(self, request):
@@ -64,7 +75,7 @@ class AnimeAnalyticsViewSet(ViewSet):
     # Returns the aggregated stats of the average rating of new titles by year
     @action(detail=False, methods=['get'], url_path='avg-rating')
     async def avg_rating(self, request):
-        matches = await self._inner_aggregate(request)
+        matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
             return Response(status=404)
 
@@ -77,7 +88,7 @@ class AnimeAnalyticsViewSet(ViewSet):
     # Returns the aggregated stats of the count of titles by year
     @action(detail=False, methods=['get'], url_path='titles')
     async def titles(self, request):
-        matches = await self._inner_aggregate(request)
+        matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
             return Response(status=404)
 
@@ -90,12 +101,13 @@ class AnimeAnalyticsViewSet(ViewSet):
     # Returns the aggregated stats of the popularity of titles by year
     @action(detail=False, methods=['get'], url_path='popularity')
     async def popularity(self, request):
-        matches = await self._inner_aggregate(request)
+        matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
             return Response(status=404)
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df = df[df['popularity'].notnull()]
         df = df.groupby('year').agg({'popularity': 'mean'}).reset_index()
 
         return Response(df.to_dict(orient='records'))
@@ -103,7 +115,7 @@ class AnimeAnalyticsViewSet(ViewSet):
     # Returns the aggregated stats of the top-rated (score>7.5) titles count by year
     @action(detail=False, methods=['get'], url_path='top-rated')
     async def top_rated(self, request):
-        matches = await self._inner_aggregate(request)
+        matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
             return Response(status=404)
 
@@ -116,7 +128,7 @@ class AnimeAnalyticsViewSet(ViewSet):
     # Returns the aggregated stats of the most popular (pop>7.5) titles count by year
     @action(detail=False, methods=['get'], url_path='most-popular')
     async def most_popular(self, request):
-        matches = await self._inner_aggregate(request)
+        matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
             return Response(status=404)
 
@@ -129,7 +141,7 @@ class AnimeAnalyticsViewSet(ViewSet):
     # Returns the aggregated stats of the new shounens by year
     @action(detail=False, methods=['get'], url_path='new-shounens')
     async def new_shounens(self, request):
-        matches = await self._inner_aggregate(request)
+        matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
             return Response(status=404)
 
