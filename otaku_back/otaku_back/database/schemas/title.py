@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 from beanie import Document, Indexed
 
 from .demographic import Demographic
@@ -13,20 +13,20 @@ class Title(Document):
     title: str
     title_english: str
     title_japanese: str
-    title_synonyms: list[str]
-    # titles: list[dict]
+    title_synonyms: List[str]
+    # titles: List[dict]
 
     type: str
     episodes: int
-    genres: list[Genre]
-    demographics: list[Demographic]
+    genres: List["Genre"]
+    demographics: List["Demographic"]
     synopsis: str
 
     # aired: dict
     # airing: bool
     status: str
     # duration: str
-    producers: list[Producer]
+    producers: List["Producer"]
     year: int
 
     score: float
