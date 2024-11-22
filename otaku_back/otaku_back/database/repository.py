@@ -86,11 +86,9 @@ class Repository[T: Document]:
         instance = await self.get_by_id(instance_id)
         return instance is not None
 
-    async def aggregate(self, **kwargs) -> List[Dict[str, Any]]:
-        Repository._ensure_kwargs_have_no_id(kwargs)
-
+    async def aggregate(self, pipeline: List) -> List[Dict[str, Any]]:
         # For aggregation, you'll use the aggregation framework of MongoDB
-        return await self._model.aggregate(kwargs).to_list()
+        return await self._model.aggregate(pipeline).to_list()
 
     @staticmethod
     def _check_mongo_id(instance_id: Any):

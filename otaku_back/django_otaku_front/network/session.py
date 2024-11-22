@@ -1,7 +1,10 @@
 ﻿import requests
 from uuid import uuid4
 
+# from django.contrib.sessions.models import Session
 
+
+# use sqlite3 to store session
 session_store = {}
 
 
@@ -20,7 +23,7 @@ def set_session_auth(request, session_id, access_token, refresh_token):
     request.session['access_token'] = access_token
     request.session['refresh_token'] = refresh_token
     request.session['session_id'] = session_id
-    
+
     session = get_session(session_id)
     session.headers.update({
         'Authorization': f'Bearer {access_token}'
@@ -31,7 +34,7 @@ def delete_tokens(session_id):
     session = get_session(session_id)
     if session is None:
         return
-    
+
     if 'Authorization' in session.headers:
         del session.headers['Authorization']
     if 'Refresh-Token' in session.headers:
