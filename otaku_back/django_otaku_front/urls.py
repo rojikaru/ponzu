@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views.anime import AnimeListView, AnimeCreateView, AnimeEditView, AnimeView, anime_delete
-from .views.graph import dashboard_redirect, DashboardViewSet, GraphViewSet
+from .views.graph import dashboard_redirect, DashboardViewSet, GraphViewSet, GraphImageView
 from .views.login import LoginView
 from .views.logout import logout_view
 from .views.register import RegisterView
@@ -18,6 +18,7 @@ urlpatterns = [
     path('dashboard/', dashboard_redirect, name='dashboard'),
     path('dashboard/<str:version>/', DashboardViewSet.as_view(), name='dashboard_page'),
     path('dashboard/<str:version>/<str:graph>/', GraphViewSet.as_view(), name='dashboard_graph'),
+    path('graph/image/<path:graph_url>/<path:version>/', GraphImageView.as_view(), name='graph_image'),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
     path('logout/', logout_view, name='logout'),
