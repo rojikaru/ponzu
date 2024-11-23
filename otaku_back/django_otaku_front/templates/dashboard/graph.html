@@ -1,33 +1,41 @@
 ﻿{% extends "dashboard/_base.html" %}
 
+{% block head %}
+    <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-3.6.1.min.css">
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.6.1.min.js"></script>
+{% endblock head %}
+
 {% block dashboard_content %}
     {% include "dashboard/navigation.html" %}
     <div class="w-full md:w-3/4 ml-0 md:ml-4">
         <div id="graph-container" class="bg-white p-4 shadow rounded">
-            {% if graph %}
-                <p class="text-3xl mb-4">{{ graph.title }}</p>
+                <p class="text-3xl mb-4">{{ graph_title }}</p>
                 <form method="get">
                     <label for="start_year">Select Start Year:</label>
                     <select name="start_year" id="start_year" onchange="this.form.submit()">
-                        {% for year in graph.graph.keys %}
+                        {% for year in years %}
                             <option value="{{ year }}" {% if year == selected_start_year %}selected{% endif %}>{{ year }}</option>
                         {% endfor %}
                     </select>
                     <label for="end_year">Select End Year:</label>
                     <select name="end_year" id="end_year" onchange="this.form.submit()">
-                        {% for year in graph.graph.keys %}
+                        {% for year in years %}
                             <option value="{{ year }}" {% if year == selected_end_year %}selected{% endif %}>{{ year }}</option>
                         {% endfor %}
                     </select>
                 </form>
-                <img src="{% url 'graph_image' url version %}?start_year={{ selected_start_year }}&end_year={{ selected_end_year }}" alt="{{ graph.title }}" class="w-full h-auto object-cover">
+                {% if version == 'v1' %}
+                    <img src="{% url 'graph_image' url %}" alt="{{ graph.title }}" class="w-2/3 mx-auto h-auto object-cover">
+                {% else %}
+                    {{ bokeh_div|safe }}
+                    {{ bokeh_script|safe }}
+                {% endif %}
                 <div class="mt-4">
                     <p>Max Value: {{ max_value }}</p>
                     <p>Min Value: {{ min_value }}</p>
                     <p>Median Value: {{ median_value }}</p>
                     <p>Average Value: {{ avg_value }}</p>
                 </div>
-            {% endif %}
         </div>
     </div>
 {% endblock dashboard_content %}

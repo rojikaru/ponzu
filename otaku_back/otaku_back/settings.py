@@ -31,7 +31,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SERIALIZER_CLASSES': {
         'TokenObtainPairSerializer': 'otaku_back.database.schemas.serializers.AuthSerializer',
     },
-    'EXCEPTION_HANDLER': 'otaku_back.security.exceptions.handlers.api_exception_handler',
+    # 'EXCEPTION_HANDLER': 'otaku_back.security.exceptions.handlers.api_exception_handler',
 }
 
 SIMPLE_JWT = {

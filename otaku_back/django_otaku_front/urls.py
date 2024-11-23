@@ -7,8 +7,6 @@ from .views.logout import logout_view
 from .views.register import RegisterView
 
 urlpatterns = [
-    # path('', HomeView.as_view(), name='home'),
-
     path('', AnimeListView.as_view(), name='home'),
     path('anime/', AnimeListView.as_view(), name='anime_list'),
     path('anime/create/', AnimeCreateView.as_view(), name='anime_create'),
@@ -18,7 +16,7 @@ urlpatterns = [
     path('dashboard/', dashboard_redirect, name='dashboard'),
     path('dashboard/<str:version>/', DashboardViewSet.as_view(), name='dashboard_page'),
     path('dashboard/<str:version>/<str:graph>/', GraphViewSet.as_view(), name='dashboard_graph'),
-    path('graph/image/<path:graph_url>/<path:version>/', GraphImageView.as_view(), name='graph_image'),
+    path('graph/image/<path:graph_url>', GraphImageView.as_view(), name='graph_image'),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
     path('logout/', logout_view, name='logout'),
