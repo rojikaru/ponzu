@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Optional
-from uuid import UUID
 
 from beanie import Document, before_event, Link
 from beanie.odm.actions import EventTypes

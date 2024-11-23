@@ -1,5 +1,3 @@
-from http.client import responses
-
 from django_otaku_front.network.session import set_session_auth, create_session, get_session
 from otaku_back.env import ENVIRON
 

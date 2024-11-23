@@ -3,7 +3,6 @@ import logging
 
 from adrf.viewsets import ViewSet
 from django.core.exceptions import BadRequest
-from pymongo.errors import OperationFailure
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -45,9 +44,9 @@ class AnimeAnalyticsViewSet(ViewSet):
             'url': api_url + 'analytics/anime/popularity',
         },
         {
-            'name': 'new-shounens',
-            'friendly_name': 'New Shounens',
-            'url': api_url + 'analytics/anime/new-shounens',
+            'name': 'new-longest',
+            'friendly_name': 'New longest anime',
+            'url': api_url + 'analytics/anime/new-longest',
         },
     ]
 
@@ -81,7 +80,7 @@ class AnimeAnalyticsViewSet(ViewSet):
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
-        df = df.groupby('year').agg({'rating': 'mean'}).reset_index()
+        df = df.groupby('year').agg({'score': 'mean'}).reset_index()
 
         return Response(df.to_dict(orient='records'))
 
@@ -121,7 +120,7 @@ class AnimeAnalyticsViewSet(ViewSet):
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
-        df = df[df['rating'] > 7.5].groupby('year').size().reset_index(name='count')
+        df = df[df['score'] > 7.5].groupby('year').size().reset_index(name='count')
 
         return Response(df.to_dict(orient='records'))
 
@@ -138,15 +137,15 @@ class AnimeAnalyticsViewSet(ViewSet):
 
         return Response(df.to_dict(orient='records'))
 
-    # Returns the aggregated stats of the new shounens by year
-    @action(detail=False, methods=['get'], url_path='new-shounens')
-    async def new_shounens(self, request):
+    # Returns the aggregated stats of the new longest anime by year
+    @action(detail=False, methods=['get'], url_path='new-longest')
+    async def new_longest(self, request):
         matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
             return Response(status=404)
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
-        df = df[df['genre'] == 'Shounen'].groupby('year').size().reset_index(name='count')
+        df.groupby('year').apply(lambda x: x.loc[x['episodes'].idxmax()])
 
         return Response(df.to_dict(orient='records'))
