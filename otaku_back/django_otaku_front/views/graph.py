@@ -1,14 +1,13 @@
 ﻿import datetime
 
-from bokeh.embed import components
-from django.shortcuts import redirect
-from django.views.generic import TemplateView
-import plotly.graph_objects as go
-from bokeh.plotting import figure
-import io
-from django.http import HttpResponse
-from django.views import View
 import numpy as np
+import plotly.graph_objects as go
+from bokeh.embed import components
+from bokeh.plotting import figure
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.views import View
+from django.views.generic import TemplateView
 
 from django_otaku_front.network.helper import get_dashboard_version_list, get_anime_graph_list, get_anime_graph_data
 
@@ -65,7 +64,6 @@ class GraphViewSet(TemplateView):
             return context
 
         k, v = data[0].keys()
-        keys = np.array([x[k] for x in data])
         values = np.array([x[v] for x in data])
         context['max_value'] = np.max(values)
         context['min_value'] = np.min(values)
