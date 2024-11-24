@@ -27,8 +27,8 @@
                 {% if version == 'v1' %}
                     <img src="{% url 'graph_image' url %}" alt="{{ graph.title }}" class="w-2/3 mx-auto h-auto object-cover">
                 {% else %}
-                    {{ bokeh_div|safe }}
                     {{ bokeh_script|safe }}
+                    {{ bokeh_div|safe }}
                 {% endif %}
                 <div class="mt-4">
                     <p>Max Value: {{ max_value }}</p>

@@ -64,7 +64,6 @@ class GraphViewSet(TemplateView):
             context['title'] = 'No data available'
             return context
 
-        print(data)
         k, v = data[0].keys()
         keys = np.array([x[k] for x in data])
         values = np.array([x[v] for x in data])
@@ -74,6 +73,11 @@ class GraphViewSet(TemplateView):
         context['median_value'] = np.median(values)
 
         if kwargs['version'] == 'v2':
+            keys = np.array([
+                datetime.datetime.strptime(x[k], '%Y-%m-%dT%H:%M:%S').year
+                for x in data
+            ])
+
             fig = figure(x_axis_label='Year', y_axis_label='Value')
             fig.line(keys, values, line_width=2)
 
