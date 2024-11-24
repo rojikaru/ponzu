@@ -98,12 +98,6 @@ class GraphImageView(View):
         fig = go.Figure(data=go.Scatter(x=keys, y=values, mode='lines+markers'))
         fig.update_layout(xaxis_title='Year', yaxis_title='Value')
 
-        buffer = io.BytesIO()
-        try:
-            fig.write_image(buffer, format='png')
-            buffer.seek(0)
-            img_bytes = buffer.read()
-        finally:
-            buffer.close()
+        img_bytes = fig.to_image(format='png')
 
         return HttpResponse(img_bytes, content_type='image/png')

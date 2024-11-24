@@ -124,7 +124,7 @@ class AnimeAnalyticsViewSet(ViewSet):
 
         return Response(df.to_dict(orient='records'))
 
-    # Returns the aggregated stats of the most popular (pop>7.5) titles count by year
+    # Returns the aggregated stats of the most popular titles count by year
     @action(detail=False, methods=['get'], url_path='most-popular')
     async def most_popular(self, request):
         matches = await self._inner_aggregate(request.body)
@@ -133,7 +133,7 @@ class AnimeAnalyticsViewSet(ViewSet):
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
-        df = df[df['popularity'] > 7.5].groupby('year').size().reset_index(name='count')
+        df = df[df['popularity'] < 1000].groupby('year').size().reset_index(name='count')
 
         return Response(df.to_dict(orient='records'))
 
@@ -146,6 +146,6 @@ class AnimeAnalyticsViewSet(ViewSet):
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
-        df.groupby('year').apply(lambda x: x.loc[x['episodes'].idxmax()])
+        df = df.sort_values('episodes', ascending=False).groupby('year').size().reset_index()
 
         return Response(df.to_dict(orient='records'))
