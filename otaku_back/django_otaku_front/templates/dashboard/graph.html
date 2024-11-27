@@ -11,21 +11,10 @@
         <div id="graph-container" class="bg-white p-4 shadow rounded">
                 <p class="text-3xl mb-4">{{ graph_title }}</p>
                 <form method="get">
-                    <label for="start_year">Select Start Year:</label>
-                    <select name="start_year" id="start_year" onchange="this.form.submit()">
-                        {% for year in years %}
-                            <option value="{{ year }}" {% if year == selected_start_year %}selected{% endif %}>{{ year }}</option>
-                        {% endfor %}
-                    </select>
-                    <label for="end_year">Select End Year:</label>
-                    <select name="end_year" id="end_year" onchange="this.form.submit()">
-                        {% for year in years %}
-                            <option value="{{ year }}" {% if year == selected_end_year %}selected{% endif %}>{{ year }}</option>
-                        {% endfor %}
-                    </select>
+                    {% csrf_token %}
                 </form>
                 {% if version == 'v1' %}
-                    <img src="{% url 'graph_image' url %}" alt="{{ graph.title }}" class="w-2/3 mx-auto h-auto object-cover">
+                    <img src="{% url 'graph_image' url %}?min_year={{ min_year }}&max_year={{ max_year }}" alt="{{ graph.title }}" class="w-2/3 mx-auto h-auto object-cover">
                 {% else %}
                     {{ bokeh_script|safe }}
                     {{ bokeh_div|safe }}
