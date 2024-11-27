@@ -49,15 +49,28 @@ class GraphViewSet(TemplateView):
             'Graph'  # Default value if no match is found
         )
 
+        min_year = self.request.GET.get('min_year')
+        max_year = self.request.GET.get('max_year')
+
+        year_matcher = dict()
+        if min_year:
+            # $gte is MongoDB syntax for greater than or equal to
+            year_matcher['$gte'] = int(min_year)
+        if max_year:
+            # $lte is MongoDB syntax for less than or equal to
+            year_matcher['$lte'] = int(max_year)
         data = get_anime_graph_data(
             self.request.session.get('session_id'),
             kwargs['graph'],
-            # pipeline=[
-            # {"$match": {"age": {"$gte": 18}}},  # Match users with age >= 18
-            # {"$group": {"_id": "$city", "average_age": {"$avg": "$age"}}},
-            # Group by city and calculate average age
-            # {"$sort": {"average_age": -1}},  # Sort by average_age descending
-            # ]
+            # Match users with age >= 18
+
+            pipeline=[
+                {
+                    "$match": {
+                        "year": year_matcher
+                    }
+                }
+            ]
         )
         if not data:
             context['title'] = 'No data available'
@@ -70,11 +83,24 @@ class GraphViewSet(TemplateView):
         context['avg_value'] = np.mean(values)
         context['median_value'] = np.median(values)
 
+        years = np.array([x[k] for x in data])
+        context['min_year'] = np.min(years)
+        context['max_year'] = np.max(years)
+
+        # create a form for the user to filter the data
+        form = MyDynamicForm
+        if form.is_valid():
+            # Handle the form data
+            selected_value = form.cleaned_data['dynamic_field']
+            print(f"Selected: {selected_value}")
+
+        context['form'] = {
+            'min_year': min_year,
+            'max_year': max_year,
+        }
+
         if kwargs['version'] == 'v2':
-            keys = np.array([
-                datetime.datetime.strptime(x[k], '%Y-%m-%dT%H:%M:%S').year
-                for x in data
-            ])
+            keys = np.array([x[k] for x in data])
 
             fig = figure(x_axis_label='Year', y_axis_label='Value')
             fig.line(keys, values, line_width=2)
@@ -91,10 +117,7 @@ class GraphImageView(View):
         url = kwargs['graph_url']
         data = get_anime_graph_data(request.session.get('session_id'), url)
         k, v = data[0].keys()
-        keys = np.array([
-            datetime.datetime.strptime(x[k], '%Y-%m-%dT%H:%M:%S').year
-            for x in data
-        ])
+        keys = np.array([x[k] for x in data])
         values = np.array([x[v] for x in data])
 
         fig = go.Figure(data=go.Scatter(x=keys, y=values, mode='lines+markers'))

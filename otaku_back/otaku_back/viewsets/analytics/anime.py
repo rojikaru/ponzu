@@ -53,7 +53,7 @@ class AnimeAnalyticsViewSet(ViewSet):
     async def _inner_aggregate(self, body=None):
         try:
             if not body:
-                return await self.repository.get_all()
+                return await self.repository.aggregate([])
 
             pipeline = json.loads(body.decode('utf-8'))
             if not isinstance(pipeline, list):
@@ -76,10 +76,11 @@ class AnimeAnalyticsViewSet(ViewSet):
     async def avg_rating(self, request):
         matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
-            return Response(status=404)
+            return Response([])
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df['year'] = df['year'].dt.year
         df = df.groupby('year').agg({'score': 'mean'}).reset_index()
 
         return Response(df.to_dict(orient='records'))
@@ -89,10 +90,11 @@ class AnimeAnalyticsViewSet(ViewSet):
     async def titles(self, request):
         matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
-            return Response(status=404)
+            return Response([])
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df['year'] = df['year'].dt.year
         df = df.groupby('year').size().reset_index(name='count')
 
         return Response(df.to_dict(orient='records'))
@@ -102,10 +104,11 @@ class AnimeAnalyticsViewSet(ViewSet):
     async def popularity(self, request):
         matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
-            return Response(status=404)
+            return Response([])
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df['year'] = df['year'].dt.year
         df = df[df['popularity'].notnull()]
         df = df.groupby('year').agg({'popularity': 'mean'}).reset_index()
 
@@ -116,10 +119,11 @@ class AnimeAnalyticsViewSet(ViewSet):
     async def top_rated(self, request):
         matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
-            return Response(status=404)
+            return Response([])
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df['year'] = df['year'].dt.year
         df = df[df['score'] > 7.5].groupby('year').size().reset_index(name='count')
 
         return Response(df.to_dict(orient='records'))
@@ -129,10 +133,11 @@ class AnimeAnalyticsViewSet(ViewSet):
     async def most_popular(self, request):
         matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
-            return Response(status=404)
+            return Response([])
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df['year'] = df['year'].dt.year
         df = df[df['popularity'] < 1000].groupby('year').size().reset_index(name='count')
 
         return Response(df.to_dict(orient='records'))
@@ -142,10 +147,11 @@ class AnimeAnalyticsViewSet(ViewSet):
     async def new_longest(self, request):
         matches = await self._inner_aggregate(request.body)
         if len(matches) == 0:
-            return Response(status=404)
+            return Response([])
 
         df = pd.DataFrame(matches)
         df['year'] = pd.to_datetime(df['year'], format='%Y')
+        df['year'] = df['year'].dt.year
         df = df.sort_values('episodes', ascending=False).groupby('year').size().reset_index()
 
         return Response(df.to_dict(orient='records'))

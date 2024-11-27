@@ -117,9 +117,6 @@ def get_anime_graph_data(session_id, graph_slug, pipeline=None):
     if session is None:
         return None
 
-    if pipeline is None:
-       pipeline = []
-
     response = session.get(
         get_full_url(f'analytics/anime/{graph_slug}'),
         json=pipeline
