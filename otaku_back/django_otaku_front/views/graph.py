@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import TemplateView
 
+from django_otaku_front.forms.graph import GraphForm
 from django_otaku_front.network.helper import get_dashboard_version_list, get_anime_graph_list, get_anime_graph_data
 
 
@@ -59,18 +60,19 @@ class GraphViewSet(TemplateView):
         if max_year:
             # $lte is MongoDB syntax for less than or equal to
             year_matcher['$lte'] = int(max_year)
+
+        pipeline = []
+        if year_matcher:
+            pipeline.append({
+                "$match": {
+                    "year": year_matcher
+                }
+            })
+
         data = get_anime_graph_data(
             self.request.session.get('session_id'),
             kwargs['graph'],
-            # Match users with age >= 18
-
-            pipeline=[
-                {
-                    "$match": {
-                        "year": year_matcher
-                    }
-                }
-            ]
+            pipeline=pipeline
         )
         if not data:
             context['title'] = 'No data available'
@@ -83,27 +85,16 @@ class GraphViewSet(TemplateView):
         context['avg_value'] = np.mean(values)
         context['median_value'] = np.median(values)
 
-        years = np.array([x[k] for x in data])
-        context['min_year'] = np.min(years)
-        context['max_year'] = np.max(years)
-
+        context['years'] = [x[k] for x in data]
+        print(data, context['years'])
+        years = np.array(context['years'])
         # create a form for the user to filter the data
-        form = MyDynamicForm
-        if form.is_valid():
-            # Handle the form data
-            selected_value = form.cleaned_data['dynamic_field']
-            print(f"Selected: {selected_value}")
-
-        context['form'] = {
-            'min_year': min_year,
-            'max_year': max_year,
-        }
+        context['form'] = GraphForm(initial={'min_year': np.min(years).astype(int), 'max_year': np.max(years).astype(int)})
+        print({'min_year': np.min(years).astype(int), 'max_year': np.max(years).astype(int)})
 
         if kwargs['version'] == 'v2':
-            keys = np.array([x[k] for x in data])
-
             fig = figure(x_axis_label='Year', y_axis_label='Value')
-            fig.line(keys, values, line_width=2)
+            fig.line(years, values, line_width=2)
 
             bokeh_script, bokeh_div = components(fig)
             context['bokeh_script'] = bokeh_script
@@ -111,11 +102,37 @@ class GraphViewSet(TemplateView):
 
         return context
 
+    def post(self, request, *args, **kwargs):
+        form = GraphForm(request.POST)
+        if not form.is_valid():
+            return self.render_to_response({'form': form, 'title': 'Graph'})
+
+        print(form.cleaned_data)
+        query_params = '?' + '&'.join([f'{x}={y}' for x, y in form.cleaned_data.items() if y])
+
+        return redirect(f'/dashboard/{kwargs["version"]}/{kwargs["graph"]}/{query_params}')
+
 
 class GraphImageView(View):
     def get(self, request, *args, **kwargs):
         url = kwargs['graph_url']
-        data = get_anime_graph_data(request.session.get('session_id'), url)
+        min_year = request.GET.get('min_year')
+        max_year = request.GET.get('max_year')
+
+        year_matcher = dict()
+        if min_year:
+            year_matcher['$gte'] = int(min_year)
+        if max_year:
+            year_matcher['$lte'] = int(max_year)
+        pipeline = []
+        if year_matcher:
+            pipeline = [{
+                "$match": {
+                    "year": year_matcher
+                }
+            }]
+
+        data = get_anime_graph_data(request.session.get('session_id'), url, pipeline)
         k, v = data[0].keys()
         keys = np.array([x[k] for x in data])
         values = np.array([x[v] for x in data])
