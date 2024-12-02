@@ -86,11 +86,9 @@ class GraphViewSet(TemplateView):
         context['median_value'] = np.median(values)
 
         context['years'] = [x[k] for x in data]
-        print(data, context['years'])
         years = np.array(context['years'])
         # create a form for the user to filter the data
         context['form'] = GraphForm(initial={'min_year': np.min(years).astype(int), 'max_year': np.max(years).astype(int)})
-        print({'min_year': np.min(years).astype(int), 'max_year': np.max(years).astype(int)})
 
         if kwargs['version'] == 'v2':
             fig = figure(x_axis_label='Year', y_axis_label='Value')
@@ -107,7 +105,6 @@ class GraphViewSet(TemplateView):
         if not form.is_valid():
             return self.render_to_response({'form': form, 'title': 'Graph'})
 
-        print(form.cleaned_data)
         query_params = '?' + '&'.join([f'{x}={y}' for x, y in form.cleaned_data.items() if y])
 
         return redirect(f'/dashboard/{kwargs["version"]}/{kwargs["graph"]}/{query_params}')
