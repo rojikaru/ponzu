@@ -1,11 +1,10 @@
-﻿import datetime
-
-import numpy as np
+﻿import numpy as np
 import plotly.graph_objects as go
 from bokeh.embed import components
 from bokeh.plotting import figure
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.generic import TemplateView
 
@@ -103,11 +102,21 @@ class GraphViewSet(TemplateView):
     def post(self, request, *args, **kwargs):
         form = GraphForm(request.POST)
         if not form.is_valid():
-            return self.render_to_response({'form': form, 'title': 'Graph'})
+            return self.render_to_response({'form': form, 'title': 'Custom Graph'})
+
+        valid_versions = ['v1', 'v2']  # Example list of valid versions
+        valid_graphs = [graph['name'] for graph in get_anime_graph_list(self.request.session.get('session_id'))]
+
+        version = kwargs.get("version")
+        graph = kwargs.get("graph")
 
         query_params = '?' + '&'.join([f'{x}={y}' for x, y in form.cleaned_data.items() if y])
+        if version in valid_versions and graph in valid_graphs:
+            target_url = f'/dashboard/{version}/{graph}/{query_params}'
+            if url_has_allowed_host_and_scheme(target_url, allowed_hosts=None):
+                return redirect(target_url)
 
-        return redirect(f'/dashboard/{kwargs["version"]}/{kwargs["graph"]}/{query_params}')
+        return redirect('/')
 
 
 class GraphImageView(View):
