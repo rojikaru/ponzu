@@ -139,6 +139,9 @@ class GraphImageView(View):
             }]
 
         data = get_anime_graph_data(request.session.get('session_id'), url, pipeline)
+        if data is None:
+            return HttpResponse(status=404)
+
         k, v = data[0].keys()
         keys = np.array([x[k] for x in data])
         values = np.array([x[v] for x in data])
