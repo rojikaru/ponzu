@@ -12,8 +12,8 @@
         <p class="text-gray-500 text-sm">Episodes: {{ anime.episodes }}</p>
         <p class="text-gray-500 text-sm">Year: {{ anime.year }}</p>
         <div class="text-blue-500 flex gap-4 text-right my-3">
-            <a class="hover:underline" href="{% url 'anime_edit' anime.mal_id %}">Edit</a>
-            <a class="hover:underline" href="{% url 'anime_delete' anime.mal_id %}">Delete</a>
+            <a class="hover:underline" href="{% url 'anime_edit' anime.id %}">Edit</a>
+            <a class="hover:underline" href="{% url 'anime_delete' anime.id %}">Delete</a>
         </div>
     </div>
 </div>
