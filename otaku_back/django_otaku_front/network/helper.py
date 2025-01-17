@@ -61,6 +61,9 @@ def get_user(session_id):
         return None
 
     response = session.get(get_full_url('user/me'))
+    if response.status_code >= 400:
+        return None
+
     return response.json()
 
 
@@ -70,6 +73,9 @@ def get_anime(session_id, anime_id):
         return None
 
     response = session.get(get_full_url(f'anime/{anime_id}'))
+    if response.status_code >= 400:
+        return None
+
     return response.json()
 
 
@@ -88,6 +94,9 @@ def create_anime(session_id, data):
         return None
 
     response = session.post(get_full_url('anime'), json=data)
+    if response.status_code >= 400:
+        return None
+
     return response.json()
 
 
@@ -97,6 +106,9 @@ def update_anime(session_id, anime_id, data):
         return None
 
     response = session.patch(get_full_url(f'anime/{anime_id}'), json=data)
+    if response.status_code >= 400:
+        return None
+
     return response.json()
 
 
@@ -106,6 +118,9 @@ def get_anime_list(session_id):
         return None
 
     response = session.get(get_full_url('anime'))
+    if response.status_code >= 400:
+        return None
+
     return response.json()
 
 def get_dashboard_version_list(session_id):
@@ -121,6 +136,9 @@ def get_anime_graph_data(session_id, graph_slug, pipeline=None):
         get_full_url(f'analytics/anime/{graph_slug}'),
         json=pipeline
     )
+    if response.status_code >= 400:
+        return None
+
     return response.json()
 
 
@@ -130,5 +148,7 @@ def get_anime_graph_list(session_id):
         return None
 
     response = session.get(get_full_url(f'analytics/anime'))
+    if response.status_code >= 400:
+        return None
 
     return response.json()    
