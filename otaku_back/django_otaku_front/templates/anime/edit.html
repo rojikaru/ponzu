@@ -1,6 +1,7 @@
 {% extends '_base.html' %}
 
 {% block content %}
+    {% if anime %}
     <div class="container mx-auto py-8">
         <h1 class="text-3xl font-bold mb-6 text-center">
             Edit Anime '{{ anime.title }}'
@@ -11,4 +12,11 @@
             <button type="submit" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded">Save</button>
         </form>
     </div>
+    {% else %}
+    <div class="container mx-auto py-8">
+        <h1 class="text-3xl font-bold mb-6 text-center">
+            Anime not found
+        </h1>
+    </div>
+    {% endif %}
 {% endblock content %}
