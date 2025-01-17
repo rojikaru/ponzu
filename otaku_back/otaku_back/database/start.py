@@ -1,3 +1,4 @@
+import certifi
 import motor.motor_asyncio
 from beanie import init_beanie
 
@@ -12,7 +13,10 @@ from otaku_back.env import ENVIRON
 
 # Initialize Beanie with the database and your models
 async def db_init():
-    client = motor.motor_asyncio.AsyncIOMotorClient(ENVIRON('DATABASE_URL'))
+    client = motor.motor_asyncio.AsyncIOMotorClient(
+        ENVIRON('DATABASE_URL'),
+        tlsCAFile=certifi.where()
+    )
     await init_beanie(
         database=client[ENVIRON('DATABASE_NAME')],
         document_models=[
