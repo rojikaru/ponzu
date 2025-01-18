@@ -43,11 +43,11 @@ class AnimeCreateView(TemplateView):
     def post(self, request, *args, **kwargs):
         form = AnimeCreateForm(request.POST)
         if form.is_valid():
-            create_anime(
+            anime = create_anime(
                 request.session.get('session_id'),
                 form.cleaned_data
             )
-            return redirect('anime_list')
+            return redirect('anime_detail', pk=anime['id'])
         return render(request, 'anime/create.html', {'form': form})
 
 class AnimeEditView(TemplateView):
@@ -68,6 +68,6 @@ class AnimeEditView(TemplateView):
                 kwargs['pk'],
                 form.cleaned_data
             )
-            return redirect('anime_list')
+            return redirect('anime_detail', pk=kwargs['pk'])
         return render(request, 'anime/edit.html', {'form': form})
         

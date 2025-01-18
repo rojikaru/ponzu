@@ -18,15 +18,15 @@ class Title(Document):
 
     type: str
     episodes: int
-    genres: List["Genre"]
-    demographics: List["Demographic"]
+    genres: Optional[List["Genre"]] = None
+    demographics: Optional[List["Demographic"]] = None
     synopsis: str
 
     # aired: dict
     # airing: bool
     status: str
     # duration: str
-    producers: List["Producer"]
+    producers: Optional[List["Producer"]] = None
     year: int
 
     popularity: Optional[float] = None
