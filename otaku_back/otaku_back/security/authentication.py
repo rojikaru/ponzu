@@ -11,7 +11,6 @@ from otaku_back.database.schemas.user import User
 from django.contrib.auth.backends import BaseBackend
 
 
-
 class JWTAuthentication(authentication.BaseAuthentication):
     user_repository = Repository(User)
 
