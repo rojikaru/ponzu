@@ -12,8 +12,8 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     // Load the environment variables
-    let port = get_from_env("PORT", Some("8080"));
-    let workers = get_from_env("WORKERS", None);
+    let port: u16 = get_from_env("PORT", Some("8080"));
+    let workers: usize = get_from_env("WORKERS", None);
 
     HttpServer::new(|| {
         App::new()
