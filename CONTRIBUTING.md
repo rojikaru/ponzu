@@ -1,6 +1,6 @@
-# Contributing to OtakuRank
+# Contributing to Ponzu
 
-First off, thank you for considering contributing to OtakuRank! It's people like you that make OtakuRank such a great tool for anime and manga enthusiasts.
+First off, thank you for considering contributing to Ponzu! It's people like you that make Ponzu such a great tool for anime and manga enthusiasts.
 
 ## Code of Conduct
 
@@ -10,7 +10,7 @@ By participating in this project, you are expected to uphold our Code of Conduct
 
 ### Reporting Bugs
 
-This section guides you through submitting a bug report for OtakuRank. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
+This section guides you through submitting a bug report for Ponzu. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
 
 - Use a clear and descriptive title for the issue to identify the problem.
 - Describe the exact steps which reproduce the problem in as many details as possible.
@@ -18,15 +18,15 @@ This section guides you through submitting a bug report for OtakuRank. Following
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion for OtakuRank, including completely new features and minor improvements to existing functionality.
+This section guides you through submitting an enhancement suggestion for Ponzu, including completely new features and minor improvements to existing functionality.
 
 - Use a clear and descriptive title for the issue to identify the suggestion.
 - Provide a step-by-step description of the suggested enhancement in as many details as possible.
-- Provide specific examples to demonstrate the steps or point out the part of OtakuRank where the suggestion is related to.
+- Provide specific examples to demonstrate the steps or point out the part of Ponzu where the suggestion is related to.
 
 ### Your First Code Contribution
 
-Unsure where to begin contributing to OtakuRank? You can start by looking through these `beginner` and `help-wanted` issues:
+Unsure where to begin contributing to Ponzu? You can start by looking through these `beginner` and `help-wanted` issues:
 
 - Beginner issues - issues which should only require a few lines of code, and a test or two.
 - Help wanted issues - issues which should be a bit more involved than `beginner` issues.
@@ -35,10 +35,10 @@ Unsure where to begin contributing to OtakuRank? You can start by looking throug
 
 The process described here has several goals:
 
-- Maintain OtakuRank's quality
+- Maintain Ponzu's quality
 - Fix problems that are important to users
-- Engage the community in working toward the best possible OtakuRank
-- Enable a sustainable system for OtakuRank's maintainers to review contributions
+- Engage the community in working toward the best possible Ponzu
+- Enable a sustainable system for Ponzu's maintainers to review contributions
 
 Please follow these steps to have your contribution considered by the maintainers:
 
@@ -103,4 +103,4 @@ This section lists the labels we use to help us track and manage issues and pull
 6. Push changes to your fork
 7. Open a PR in our repository and follow the PR template so that we can efficiently review the changes
 
-Thank you for contributing to OtakuRank!
+Thank you for contributing to Ponzu!
