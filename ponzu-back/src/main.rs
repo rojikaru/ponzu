@@ -1,8 +1,10 @@
 mod endpoints;
+mod env;
 
+use crate::endpoints::{echo, hello, manual_hello};
+use crate::env::get_from_env;
 use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
-use crate::endpoints::{echo, hello, manual_hello};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -10,10 +12,8 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     // Load the environment variables
-    let port: u16 = std::env::var("PORT")
-        .unwrap_or("8080".to_string())
-        .parse()
-        .unwrap();
+    let port = get_from_env("PORT", Some("8080"));
+    let workers = get_from_env("WORKERS", None);
 
     HttpServer::new(|| {
         App::new()
@@ -21,9 +21,8 @@ async fn main() -> std::io::Result<()> {
             .service(echo)
             .route("/hey", web::get().to(manual_hello))
     })
-        .bind(("0.0.0.0", port))?
-        .run()
-        .await
+    .bind(("0.0.0.0", port))?
+    .workers(workers)
+    .run()
+    .await
 }
-
-
