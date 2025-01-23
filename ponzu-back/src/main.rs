@@ -13,7 +13,7 @@ async fn main() -> std::io::Result<()> {
 
     // Load the environment variables
     let port: u16 = get_from_env("PORT", Some("8080"));
-    let workers: usize = get_from_env("WORKERS", None);
+    let workers: usize = get_from_env("WORKERS", Some("100"));
 
     HttpServer::new(|| {
         App::new()
