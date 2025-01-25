@@ -20,7 +20,9 @@ async fn main() -> std::io::Result<()> {
     let workers_count: usize = get_from_env("WORKERS", Some("100"));
 
     // Initialize the app state
-    let database = init_database(db_url, database).await;
+    let database = init_database(db_url, database)
+        .await
+        .expect("Failed to connect to the database");
     let state = web::Data::new(AppState::new(database));
 
     // Pass the app factory and boot the server

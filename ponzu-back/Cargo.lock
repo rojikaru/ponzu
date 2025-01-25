@@ -429,10 +429,8 @@ checksum = "7e36cc9d416881d2e24f9a963be5fb1cd90966419ac844274161d10488b3e825"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
- "js-sys",
  "num-traits",
  "serde",
- "wasm-bindgen",
  "windows-targets 0.52.6",
 ]
 
@@ -1387,19 +1385,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mongodm"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d46cce2fd70416c47d0a05adfab082814e690b40ab2f67e16a3cf1f853d4510e"
-dependencies = [
- "async-trait",
- "futures-core",
- "futures-util",
- "mongodb",
- "serde",
-]
-
-[[package]]
 name = "num-conv"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1496,10 +1481,9 @@ name = "ponzu-back"
 version = "0.1.0"
 dependencies = [
  "actix-web",
- "chrono",
  "colored",
  "dotenv",
- "mongodm",
+ "mongodb",
  "serde",
  "serde_json",
 ]

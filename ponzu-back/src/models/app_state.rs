@@ -1,5 +1,5 @@
+use mongodb::Database;
 use std::sync::Arc;
-use mongodm::mongo::Database;
 
 pub struct AppState {
     db: Arc<Database>,
@@ -8,8 +8,6 @@ pub struct AppState {
 impl AppState {
     pub fn new(db: Database) -> Self {
         let db = Arc::new(db);
-        AppState {
-            db,
-        }
+        AppState { db }
     }
 }
