@@ -3,7 +3,7 @@ use serde_json::Value;
 use crate::models::genre::Genre;
 use crate::models::producer::Producer;
 
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Title {
     mal_id: i32,
     title: String,
@@ -25,13 +25,13 @@ struct Title {
 }
 
 // Inherit Title struct for Anime
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Anime {
     #[serde(flatten)]
     title: Title
 }
 
-#[derive(PartialEq, Debug, Serialize, Deserialize,)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Manga {
     #[serde(flatten)]
     title: Title,

@@ -1,11 +1,12 @@
 use crate::env::get_from_env;
-use crate::services::app_state::AppState;
-use crate::services::database::init_database;
+use crate::models::app_state::AppState;
 use actix_web::{web, App, HttpServer};
+use database::init_database;
 use dotenv::dotenv;
 
+mod database;
 mod env;
-mod services;
+mod models;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -19,7 +20,8 @@ async fn main() -> std::io::Result<()> {
     let workers_count: usize = get_from_env("WORKERS", Some("100"));
 
     // Initialize the app state
-    let state = web::Data::new(AppState::new(init_database(db_url, database).await));
+    let database = init_database(db_url, database).await;
+    let state = web::Data::new(AppState::new(database));
 
     // Pass the app factory and boot the server
     HttpServer::new(move || {
