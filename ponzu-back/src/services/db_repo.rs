@@ -1,5 +1,7 @@
+use std::str::FromStr;
 use futures::StreamExt;
-use mongodb::bson::Document;
+use mongodb::bson::{doc, Document};
+use mongodb::bson::oid::ObjectId;
 use mongodb::error::Error;
 use mongodb::options::{AggregateOptions, FindOptions, UpdateModifications};
 use mongodb::results::{DeleteResult, UpdateResult};
@@ -15,14 +17,25 @@ use serde::Serialize;
 /// # Type Parameters
 /// - `T`: The type of documents stored in the collection. This type must implement
 ///        `Send`, `Sync`, `Unpin`, `DeserializeOwned`, and `Serialize` traits.
-pub struct DatabaseRepository<T>
-where
-    T: Send + Sync + Unpin + DeserializeOwned + Serialize,
-{
+pub struct DatabaseRepository<T: Send + Sync + Unpin + DeserializeOwned + Serialize> {
     collection: Collection<T>,
 }
 
 impl<T: Send + Sync + Unpin + DeserializeOwned + Serialize> DatabaseRepository<T> {
+    /// Converts a string to a MongoDB `ObjectId`.
+    ///
+    /// # Parameters
+    /// - `id`: The string representation of the `_id` field.
+    ///
+    /// # Returns
+    /// A `Result` containing the `ObjectId` if successful, or an `Error` if the operation fails.
+    fn get_object_id(&self, id: &str) -> Result<ObjectId, Error> {
+        match ObjectId::from_str(id) {
+            Ok(oid) => Ok(oid),
+            Err(e) => Err(Error::custom(format!("Invalid ObjectId: {}", e))),
+        }
+    }
+
     /// Creates a new instance of `DatabaseRepository`.
     ///
     /// # Parameters
@@ -45,7 +58,7 @@ impl<T: Send + Sync + Unpin + DeserializeOwned + Serialize> DatabaseRepository<T
     /// A `Result` containing a `Vec<T>` of documents if successful, or an `Error` if the operation fails.
     pub async fn find(
         &self,
-        filter: Document,
+        filter: Option<Document>,
         limit: Option<i64>,
         skip: Option<u64>,
     ) -> Result<Vec<T>, Error> {
@@ -53,8 +66,12 @@ impl<T: Send + Sync + Unpin + DeserializeOwned + Serialize> DatabaseRepository<T
         let options = FindOptions::builder().limit(limit).skip(skip).build();
 
         // Execute the query with the provided filter and options
-        // This function takes 1 parameter, but 2 parameters were supplied [E0061]
-        let mut cursor = self.collection.find(filter).with_options(options).await?;
+        let mut cursor = match filter {
+            Some(filter) => self.collection.find(filter),
+            None => self.collection.find(doc! {}),
+        }
+        .with_options(options)
+        .await?;
 
         // Collect the results into a Vec<T>
         let mut results = Vec::new();
@@ -76,11 +93,22 @@ impl<T: Send + Sync + Unpin + DeserializeOwned + Serialize> DatabaseRepository<T
     /// A `Result` containing an `Option<T>` if successful, or an `Error` if the operation fails.
     /// The `Option<T>` will be `Some(T)` if a document is found, otherwise `None`.
     pub async fn find_one(&self, filter: Document) -> Result<Option<T>, Error> {
-        let result = self.collection.find_one(filter).await?;
-        match result {
+        match self.collection.find_one(filter).await? {
             Some(doc) => Ok(Some(doc)),
             None => Ok(None),
         }
+    }
+
+    /// Finds a single document in the collection by its `_id` field.
+    ///
+    /// # Parameters
+    /// - `id`: The `_id` of the document to find.
+    ///
+    /// # Returns
+    /// A `Result` containing an `Option<T>` if successful, or an `Error` if the operation fails.
+    /// The `Option<T>` will be `Some(T)` if a document is found, otherwise `None`.
+    pub async fn find_by_id(&self, id: &str) -> Result<Option<T>, Error> {
+        self.find_one(doc! { "_id": self.get_object_id(id)? }).await
     }
 
     /// Inserts a single document into the collection.
@@ -112,6 +140,22 @@ impl<T: Send + Sync + Unpin + DeserializeOwned + Serialize> DatabaseRepository<T
         self.collection.update_one(filter, update).await
     }
 
+    /// Updates a single document in the collection by its `_id` field.
+    ///
+    /// # Parameters
+    /// - `id`: The `_id` of the document to update.
+    /// - `update`: The update operations to apply to the matching document.
+    ///
+    /// # Returns
+    /// A `Result` containing an `UpdateResult` if successful, or an `Error` if the operation fails.
+    pub async fn update_by_id(
+        &self,
+        id: &str,
+        update: impl Into<UpdateModifications>,
+    ) -> Result<UpdateResult, Error> {
+        self.update_one(doc! { "_id": self.get_object_id(id)? }, update).await
+    }
+
     /// Deletes a single document from the collection that matches the provided filter.
     ///
     /// # Parameters
@@ -121,6 +165,17 @@ impl<T: Send + Sync + Unpin + DeserializeOwned + Serialize> DatabaseRepository<T
     /// A `Result` containing a `DeleteResult` if successful, or an `Error` if the operation fails.
     pub async fn delete_one(&self, filter: Document) -> Result<DeleteResult, Error> {
         self.collection.delete_one(filter).await
+    }
+
+    /// Deletes a single document from the collection by its `_id` field.
+    ///
+    /// # Parameters
+    /// - `id`: The `_id` of the document to delete.
+    ///
+    /// # Returns
+    /// A `Result` containing a `DeleteResult` if successful, or an `Error` if the operation fails.
+    pub async fn delete_by_id(&self, id: &str) -> Result<DeleteResult, Error> {
+        self.delete_one(doc! { "_id": self.get_object_id(id)? }).await
     }
 
     /// Counts the number of documents in the collection that match the provided filter.
