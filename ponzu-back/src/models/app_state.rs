@@ -1,8 +1,10 @@
 use mongodb::Database;
 use std::sync::Arc;
 
+/// The application state.
 pub struct AppState {
-    db: Arc<Database>,
+    /// The MongoDB database that the application uses.
+    pub(crate) db: Arc<Database>,
 }
 
 impl AppState {
