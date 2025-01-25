@@ -7,6 +7,7 @@ use dotenv::dotenv;
 mod database;
 mod env;
 mod models;
+mod services;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
