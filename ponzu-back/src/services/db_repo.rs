@@ -16,12 +16,12 @@ use serde::Serialize;
 ///
 /// # Type Parameters
 /// - `T`: The type of documents stored in the collection. This type must implement
-///        `Send`, `Sync`, `Unpin`, `DeserializeOwned`, and `Serialize` traits.
-pub struct DatabaseRepository<T: Send + Sync + Unpin + DeserializeOwned + Serialize> {
+///        `Send`, `Sync`, `DeserializeOwned`, and `Serialize` traits.
+pub struct DatabaseRepository<T: Send + Sync + DeserializeOwned + Serialize> {
     collection: Collection<T>,
 }
 
-impl<T: Send + Sync + Unpin + DeserializeOwned + Serialize> DatabaseRepository<T> {
+impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// Converts a string to a MongoDB `ObjectId`.
     ///
     /// # Parameters
