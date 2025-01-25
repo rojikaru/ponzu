@@ -1,4 +1,4 @@
-use crate::models::bson_utils::{
+use crate::utils::bson::{
     deserialize_option_hex_string_from_object_id, serialize_option_hex_string_as_object_id,
 };
 use mongodb::bson::serde_helpers::{

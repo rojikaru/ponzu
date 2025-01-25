@@ -1,7 +1,6 @@
-use std::str::FromStr;
+use crate::utils::bson::get_object_id;
 use futures::StreamExt;
 use mongodb::bson::{doc, Document};
-use mongodb::bson::oid::ObjectId;
 use mongodb::error::Error;
 use mongodb::options::{AggregateOptions, FindOptions, UpdateModifications};
 use mongodb::results::{DeleteResult, UpdateResult};
@@ -22,20 +21,6 @@ pub struct DatabaseRepository<T: Send + Sync + DeserializeOwned + Serialize> {
 }
 
 impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
-    /// Converts a string to a MongoDB `ObjectId`.
-    ///
-    /// # Parameters
-    /// - `id`: The string representation of the `_id` field.
-    ///
-    /// # Returns
-    /// A `Result` containing the `ObjectId` if successful, or an `Error` if the operation fails.
-    fn get_object_id(&self, id: &str) -> Result<ObjectId, Error> {
-        match ObjectId::from_str(id) {
-            Ok(oid) => Ok(oid),
-            Err(e) => Err(Error::custom(format!("Invalid ObjectId: {}", e))),
-        }
-    }
-
     /// Creates a new instance of `DatabaseRepository`.
     ///
     /// # Parameters
@@ -108,7 +93,7 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// A `Result` containing an `Option<T>` if successful, or an `Error` if the operation fails.
     /// The `Option<T>` will be `Some(T)` if a document is found, otherwise `None`.
     pub async fn find_by_id(&self, id: &str) -> Result<Option<T>, Error> {
-        self.find_one(doc! { "_id": self.get_object_id(id)? }).await
+        self.find_one(doc! { "_id": get_object_id(id)? }).await
     }
 
     /// Inserts a single document into the collection.
@@ -153,7 +138,8 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
         id: &str,
         update: impl Into<UpdateModifications>,
     ) -> Result<UpdateResult, Error> {
-        self.update_one(doc! { "_id": self.get_object_id(id)? }, update).await
+        self.update_one(doc! { "_id": get_object_id(id)? }, update)
+            .await
     }
 
     /// Deletes a single document from the collection that matches the provided filter.
@@ -175,7 +161,7 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// # Returns
     /// A `Result` containing a `DeleteResult` if successful, or an `Error` if the operation fails.
     pub async fn delete_by_id(&self, id: &str) -> Result<DeleteResult, Error> {
-        self.delete_one(doc! { "_id": self.get_object_id(id)? }).await
+        self.delete_one(doc! { "_id": get_object_id(id)? }).await
     }
 
     /// Counts the number of documents in the collection that match the provided filter.

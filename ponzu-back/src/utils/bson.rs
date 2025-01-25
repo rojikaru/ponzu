@@ -1,3 +1,5 @@
+use std::str::FromStr;
+use mongodb::bson::oid::ObjectId;
 use mongodb::bson::serde_helpers::{
     deserialize_hex_string_from_object_id, serialize_hex_string_as_object_id,
 };
@@ -59,5 +61,19 @@ where
     match value {
         Some(v) => serializer.serialize_str(&v.try_to_rfc3339_string().unwrap()),
         None => serializer.serialize_none(),
+    }
+}
+
+/// Converts a string to a MongoDB `ObjectId`.
+///
+/// # Parameters
+/// - `id`: The string representation of the `_id` field.
+///
+/// # Returns
+/// A `Result` containing the `ObjectId` if successful, or an `Error` if the operation fails.
+pub(crate) fn get_object_id(id: &str) -> Result<ObjectId, mongodb::error::Error> {
+    match ObjectId::from_str(id) {
+        Ok(oid) => Ok(oid),
+        Err(e) => Err(mongodb::error::Error::custom(format!("Invalid ObjectId: {}", e))),
     }
 }

@@ -6,5 +6,3 @@ pub mod user;
 pub mod title;
 pub mod review;
 
-// Private modules
-mod bson_utils;
