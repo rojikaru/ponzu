@@ -4,7 +4,7 @@ use std::sync::Arc;
 /// The application state.
 pub struct AppState {
     /// The MongoDB database that the application uses.
-    pub(crate) db: Arc<Database>,
+    db: Arc<Database>,
 }
 
 impl AppState {
