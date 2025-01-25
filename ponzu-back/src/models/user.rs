@@ -1,8 +1,20 @@
-use mongodm::{field, CollectionConfig, Index, Indexes, Model};
+use crate::models::bson_utils::{
+    deserialize_option_hex_string_from_object_id, serialize_option_hex_string_as_object_id,
+    serialize_option_bson_datetime_as_rfc3339_string
+};
+use mongodb::bson::serde_helpers::serialize_bson_datetime_as_rfc3339_string;
+use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
+    #[serde(
+        rename = "_id",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_option_hex_string_as_object_id",
+        deserialize_with = "deserialize_option_hex_string_from_object_id"
+    )]
+    pub id: Option<String>,
     pub username: String,
     pub email: String,
     pub password: String,
@@ -11,12 +23,16 @@ pub struct User {
     pub is_superuser: bool,
     pub image: Option<String>,
     pub bio: Option<String>,
-    pub birth_date: Option<chrono::DateTime<chrono::Utc>>,
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_option_bson_datetime_as_rfc3339_string"
+    )]
+    pub birth_date: Option<DateTime>,
+    #[serde(serialize_with = "serialize_bson_datetime_as_rfc3339_string")]
+    pub created_at: DateTime,
+    #[serde(serialize_with = "serialize_bson_datetime_as_rfc3339_string")]
+    pub updated_at: DateTime,
 }
-
-pub struct UserCollConf;
 
 impl User {
     pub fn new(
@@ -28,11 +44,12 @@ impl User {
         is_superuser: bool,
         image: Option<String>,
         bio: Option<String>,
-        birth_date: Option<chrono::DateTime<chrono::Utc>>,
-        created_at: chrono::DateTime<chrono::Utc>,
-        updated_at: chrono::DateTime<chrono::Utc>,
+        birth_date: Option<DateTime>,
+        created_at: DateTime,
+        updated_at: DateTime,
     ) -> Self {
         Self {
+            id: None,
             username,
             email,
             password,
@@ -45,21 +62,5 @@ impl User {
             created_at,
             updated_at,
         }
-    }
-}
-
-impl Model for User {
-    type CollConf = UserCollConf;
-}
-
-impl CollectionConfig for UserCollConf {
-    fn collection_name() -> &'static str {
-        "users"
-    }
-
-    fn indexes() -> Indexes {
-        Indexes::new()
-            .with(Index::new(field!(username in User)))
-            .with(Index::new(field!(email in User)))
     }
 }
