@@ -5,17 +5,15 @@ use serde::{Deserialize, Serialize};
 pub struct Genre {
     pub mal_id: i32,
     pub name: String,
-    pub r#type: String,
 }
 
 pub struct GenreCollConf;
 
 impl Genre {
-    pub fn new(mal_id: i32, name: String, r#type: String) -> Self {
+    pub fn new(mal_id: i32, name: String) -> Self {
         Self {
             mal_id,
             name,
-            r#type,
         }
     }
 }
