@@ -2,13 +2,14 @@ use std::sync::Arc;
 use mongodm::mongo::Database;
 
 pub struct AppState {
-    pub db: Arc<Database>,
+    db: Arc<Database>,
 }
 
 impl AppState {
     pub fn new(db: Database) -> Self {
+        let db = Arc::new(db);
         AppState {
-            db: Arc::new(db),
+            db,
         }
     }
 }

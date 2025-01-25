@@ -7,3 +7,5 @@ edition = "2021"
 actix-web = "4"
 dotenv = "0.15.0"
 mongodm = "0.10.0"
+serde = { version = "1.0.217", features = ["derive"] }
+colored= "3.0.0"
