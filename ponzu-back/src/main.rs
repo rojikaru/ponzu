@@ -4,10 +4,10 @@ use actix_web::{web, App, HttpServer};
 use database::init_database;
 use dotenv::dotenv;
 
+mod services;
 mod database;
 mod env;
 mod models;
-mod services;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
