@@ -15,7 +15,7 @@ use serde::Serialize;
 /// # Type Parameters
 /// - `T`: The type of documents stored in the collection. This type must implement
 ///        `Send`, `Sync`, `Unpin`, `DeserializeOwned`, and `Serialize` traits.
-struct DatabaseRepository<T>
+pub struct DatabaseRepository<T>
 where
     T: Send + Sync + Unpin + DeserializeOwned + Serialize,
 {
@@ -194,7 +194,8 @@ impl<T: Send + Sync + Unpin + DeserializeOwned + Serialize> DatabaseRepository<T
         pipeline: Vec<Document>,
         options: Option<AggregateOptions>,
     ) -> Result<Vec<Document>, Error> {
-        let mut cursor = self.collection
+        let mut cursor = self
+            .collection
             .aggregate(pipeline)
             .with_options(options)
             .await?;
