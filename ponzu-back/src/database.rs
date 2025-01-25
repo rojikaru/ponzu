@@ -1,13 +1,15 @@
 use colored::Colorize;
-use mongodm::mongo::{Client, Database};
+use mongodb::error::Error;
+use mongodb::{Client, Database};
 
-pub async fn init_database(conn_str: String, name: String) -> Database {
+pub async fn init_database(conn_str: String, name: String)
+    -> Result<Database, Error> {
     // Initialize the database connection
-    let client = Client::with_uri_str(conn_str).await.unwrap();
+    let client = Client::with_uri_str(conn_str).await?;
     let db = client.database(name.as_str());
 
     println!("{} {}!", "Connected to database", name.bright_green());
 
     // Return the database
-    db
+    Ok(db)
 }
