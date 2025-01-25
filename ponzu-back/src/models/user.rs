@@ -1,7 +1,7 @@
 use mongodm::{field, CollectionConfig, Index, Indexes, Model};
 use serde::{Deserialize, Serialize};
 
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     pub username: String,
     pub email: String,

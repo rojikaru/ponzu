@@ -21,7 +21,7 @@ class Producer(Document):
 use mongodm::{field, CollectionConfig, Index, Indexes, Model};
 use serde::{Deserialize, Serialize};
 
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Producer {
     pub mal_id: i32,
     pub name: String,
