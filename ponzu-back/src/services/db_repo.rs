@@ -57,6 +57,28 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
             .or_else(|e| Err(AppError::from(e)))
     }
 
+    /// Finds documents in the collection and paginates the results.
+    ///
+    /// # Parameters
+    /// - `filter`: A MongoDB document specifying the query criteria.
+    /// - `page`: The page number to read.
+    /// - `limit`: The number of documents to read per page.
+    ///
+    /// # Returns
+    /// A `Result` containing a `Vec<T>` of documents if successful, or an `AppError` if the operation fails.
+    pub async fn find_paginated(
+        &self,
+        filter: Option<Document>,
+        page: u64,
+        limit: u64,
+    ) -> Result<Vec<T>, AppError> {
+        let options = FindOptions::builder()
+            .skip((page - 1) * limit)
+            .limit(limit as i64)
+            .build();
+        self.find(filter, Some(options)).await
+    }
+
     /// Finds a single document in the collection that matches the provided filter.
     ///
     /// # Parameters
@@ -82,7 +104,26 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// A `Result` containing an `Option<T>` if successful, or an `AppError` if the operation fails.
     /// The `Option<T>` will be `Some(T)` if a document is found, otherwise `None`.
     pub async fn find_by_id(&self, id: &str) -> Result<Option<T>, AppError> {
-        self.find_one(doc! { "_id": get_object_id(id)? }).await
+        self.find_one(doc! { "_id": get_object_id(id)? })
+            .await
+            .or_else(|e| {
+                if e.to_string().contains("not found") {
+                    Err(AppError::NotFound(format!(
+                        "Document with ID {} not found",
+                        id
+                    )))
+                } else {
+                    Err(e)
+                }
+            })
+    }
+
+    /// Returns all documents in the collection.
+    ///
+    /// # Returns
+    /// A `Result` containing a `Vec<T>` of all documents if successful, or an `AppError` if the operation fails.
+    pub async fn find_all(&self) -> Result<Vec<T>, AppError> {
+        self.find(None, None).await
     }
 
     /// Inserts a single document into the collection.
