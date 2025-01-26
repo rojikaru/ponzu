@@ -1,9 +1,10 @@
+use crate::models::app_error::AppError;
 use crate::utils::bson::get_object_id;
 use futures::TryStreamExt;
 use mongodb::bson::{doc, Document};
 use mongodb::error::Error;
 use mongodb::options::{AggregateOptions, FindOptions, UpdateModifications};
-use mongodb::results::{DeleteResult, UpdateResult};
+use mongodb::results::DeleteResult;
 use mongodb::Collection;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -39,12 +40,12 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// - `options`: Optional `FindOptions` to configure the find operation.
     ///
     /// # Returns
-    /// A `Result` containing a `Vec<T>` of documents if successful, or an `Error` if the operation fails.
+    /// A `Result` containing a `Vec<T>` of documents if successful, or an `AppError` if the operation fails.
     pub async fn find(
         &self,
         filter: Option<Document>,
         options: Option<FindOptions>,
-    ) -> Result<Vec<T>, Error> {
+    ) -> Result<Vec<T>, AppError> {
         // Execute the query
         self.collection
             .find(filter.unwrap_or(doc! {}))
@@ -53,6 +54,7 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
             // Collect the results into a Vec<T>
             .try_collect()
             .await
+            .or_else(|e| Err(AppError::from(e)))
     }
 
     /// Finds a single document in the collection that matches the provided filter.
@@ -61,13 +63,14 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// - `filter`: A MongoDB document specifying the query criteria.
     ///
     /// # Returns
-    /// A `Result` containing an `Option<T>` if successful, or an `Error` if the operation fails.
+    /// A `Result` containing an `Option<T>` if successful, or an `AppError` if the operation fails.
     /// The `Option<T>` will be `Some(T)` if a document is found, otherwise `None`.
-    pub async fn find_one(&self, filter: Document) -> Result<Option<T>, Error> {
+    pub async fn find_one(&self, filter: Document) -> Result<Option<T>, AppError> {
         match self.collection.find_one(filter).await? {
             Some(doc) => Ok(Some(doc)),
             None => Ok(None),
         }
+        .or_else(|e: Error| Err(AppError::from(e)))
     }
 
     /// Finds a single document in the collection by its `_id` field.
@@ -76,9 +79,9 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// - `id`: The `_id` of the document to find.
     ///
     /// # Returns
-    /// A `Result` containing an `Option<T>` if successful, or an `Error` if the operation fails.
+    /// A `Result` containing an `Option<T>` if successful, or an `AppError` if the operation fails.
     /// The `Option<T>` will be `Some(T)` if a document is found, otherwise `None`.
-    pub async fn find_by_id(&self, id: &str) -> Result<Option<T>, Error> {
+    pub async fn find_by_id(&self, id: &str) -> Result<Option<T>, AppError> {
         self.find_one(doc! { "_id": get_object_id(id)? }).await
     }
 
@@ -88,11 +91,14 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// - `doc`: The document to insert.
     ///
     /// # Returns
-    /// A `Result` containing the `_id` of the inserted document as a `String` if successful,
-    /// or an `Error` if the operation fails.
-    pub async fn insert_one(&self, doc: T) -> Result<String, Error> {
-        let result = self.collection.insert_one(doc).await?;
-        Ok(result.inserted_id.to_string())
+    /// A document if successful, or an `AppError` if the operation fails.
+    pub async fn insert_one(&self, doc: T) -> Result<T, AppError> {
+        match self.collection.insert_one(doc).await?.inserted_id.as_str() {
+            Some(id) => self.find_by_id(id).await?.ok_or_else(|| {
+                AppError::from(format!("Document not found after insert: {:?}", id))
+            }),
+            None => Err(AppError::from("No _id returned after insert")),
+        }
     }
 
     /// Updates a single document in the collection that matches the provided filter.
@@ -102,13 +108,29 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// - `update`: The update operations to apply to the matching document.
     ///
     /// # Returns
-    /// A `Result` containing an `UpdateResult` if successful, or an `Error` if the operation fails.
+    /// A `Result` containing the updated document if successful, or an `AppError` if the operation fails.
     pub async fn update_one(
         &self,
         filter: Document,
         update: impl Into<UpdateModifications>,
-    ) -> Result<UpdateResult, Error> {
-        self.collection.update_one(filter, update).await
+    ) -> Result<T, AppError> {
+        match self
+            .collection
+            .update_one(filter.clone(), update)
+            .await?
+            .upserted_id
+        {
+            Some(id) => self.find_by_id(id.as_str().unwrap()).await?.ok_or_else(|| {
+                AppError::from(format!(
+                    "Document not found after update: {:?}",
+                    filter.clone()
+                ))
+            }),
+            None => Err(AppError::from(format!(
+                "Document not found: {:?}",
+                filter.clone()
+            ))),
+        }
     }
 
     /// Updates a single document in the collection by its `_id` field.
@@ -118,12 +140,12 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// - `update`: The update operations to apply to the matching document.
     ///
     /// # Returns
-    /// A `Result` containing an `UpdateResult` if successful, or an `Error` if the operation fails.
+    /// A `Result` containing an updated document if successful, or an `AppError` if the operation fails.
     pub async fn update_by_id(
         &self,
         id: &str,
         update: impl Into<UpdateModifications>,
-    ) -> Result<UpdateResult, Error> {
+    ) -> Result<T, AppError> {
         self.update_one(doc! { "_id": get_object_id(id)? }, update)
             .await
     }
@@ -134,9 +156,12 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// - `filter`: A MongoDB document specifying the query criteria.
     ///
     /// # Returns
-    /// A `Result` containing a `DeleteResult` if successful, or an `Error` if the operation fails.
-    pub async fn delete_one(&self, filter: Document) -> Result<DeleteResult, Error> {
-        self.collection.delete_one(filter).await
+    /// A `Result` containing a `DeleteResult` if successful, or an `AppError` if the operation fails.
+    pub async fn delete_one(&self, filter: Document) -> Result<DeleteResult, AppError> {
+        self.collection
+            .delete_one(filter)
+            .await
+            .or_else(|e| Err(AppError::from(e)))
     }
 
     /// Deletes a single document from the collection by its `_id` field.
@@ -145,9 +170,23 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// - `id`: The `_id` of the document to delete.
     ///
     /// # Returns
-    /// A `Result` containing a `DeleteResult` if successful, or an `Error` if the operation fails.
-    pub async fn delete_by_id(&self, id: &str) -> Result<DeleteResult, Error> {
+    /// A `Result` containing a `DeleteResult` if successful, or an `AppError` if the operation fails.
+    pub async fn delete_by_id(&self, id: &str) -> Result<DeleteResult, AppError> {
         self.delete_one(doc! { "_id": get_object_id(id)? }).await
+    }
+
+    /// Deletes multiple documents from the collection that match the provided filter.
+    ///
+    /// # Parameters
+    /// - `filter`: A MongoDB document specifying the query criteria.
+    ///
+    /// # Returns
+    /// A `Result` containing a `DeleteResult` if successful, or an `AppError` if the operation fails.
+    pub async fn delete_many(&self, filter: Document) -> Result<DeleteResult, AppError> {
+        self.collection
+            .delete_many(filter)
+            .await
+            .or_else(|e| Err(AppError::from(e)))
     }
 
     /// Counts the number of documents in the collection that match the provided filter.
@@ -160,7 +199,7 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     ///
     /// # Returns
     /// A `Result` containing the count of matching documents as a `u64` if successful,
-    /// or an `Error` if the operation fails.
+    /// or an `AppError` if the operation fails.
     ///
     /// # Example
     /// ```rust
@@ -176,12 +215,12 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     ///     }
     /// }
     /// ```
-    pub async fn count_documents(&self, filter: Option<Document>) -> Result<u64, Error> {
-        let result = match filter {
-            Some(filter) => self.collection.count_documents(filter).await?,
-            None => self.collection.estimated_document_count().await?,
-        };
-        Ok(result)
+    pub async fn count_documents(&self, filter: Option<Document>) -> Result<u64, AppError> {
+        match filter {
+            Some(filter) => self.collection.count_documents(filter).await,
+            None => self.collection.estimated_document_count().await,
+        }
+        .or_else(|e| Err(AppError::from(e)))
     }
 
     /// Executes an aggregation pipeline on the collection.
@@ -196,7 +235,7 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     ///
     /// # Returns
     /// A `Result` containing a `Vec<Document>` with the results of the aggregation if successful,
-    /// or an `Error` if the operation fails.
+    /// or an `AppError` if the operation fails.
     ///
     /// # Example
     /// ```rust
@@ -220,12 +259,13 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
         &self,
         pipeline: Vec<Document>,
         options: Option<AggregateOptions>,
-    ) -> Result<Vec<Document>, Error> {
+    ) -> Result<Vec<Document>, AppError> {
         self.collection
             .aggregate(pipeline)
             .with_options(options)
             .await?
             .try_collect()
             .await
+            .or_else(|e| Err(AppError::from(e)))
     }
 }
