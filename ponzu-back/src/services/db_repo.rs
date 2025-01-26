@@ -104,7 +104,9 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// A `Result` containing an `Option<T>` if successful, or an `AppError` if the operation fails.
     /// The `Option<T>` will be `Some(T)` if a document is found, otherwise `None`.
     pub async fn find_by_id(&self, id: &str) -> Result<Option<T>, AppError> {
-        self.find_one(doc! { "_id": get_object_id(id)? })
+        let oid = get_object_id(id)
+            .or_else(|_| Err(AppError::from(("Ill-formed MongoId", 400))))?;
+        self.find_one(doc! { "_id": oid })
             .await
             .or_else(|e| {
                 if e.to_string().contains("not found") {

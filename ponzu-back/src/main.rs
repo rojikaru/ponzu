@@ -1,13 +1,17 @@
+use crate::endpoints::default::default_responder;
+use crate::endpoints::scope::create_app_scope;
 use crate::env::get_from_env;
 use crate::models::app_state::AppState;
+use actix_web::middleware::{Logger, NormalizePath, TrailingSlash};
 use actix_web::{web, App, HttpServer};
 use database::init_database;
 use dotenv::dotenv;
 
-mod services;
 mod database;
+mod endpoints;
 mod env;
 mod models;
+mod services;
 mod utils;
 
 #[actix_web::main]
@@ -30,8 +34,11 @@ async fn main() -> std::io::Result<()> {
     // Pass the app factory and boot the server
     HttpServer::new(move || {
         App::new()
+            .wrap(NormalizePath::new(TrailingSlash::Trim))
+            .wrap(Logger::default())
             .app_data(state.clone())
-            .service(web::scope("/api"))
+            .service(create_app_scope())
+            .default_service(web::route().to(default_responder))
     })
     .bind(("0.0.0.0", port))?
     .workers(workers_count)

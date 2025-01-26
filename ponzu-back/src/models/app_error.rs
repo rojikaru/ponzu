@@ -1,3 +1,4 @@
+use crate::models::error_response::SerializableError;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
 use mongodb::error::Error as MongoError;
@@ -16,8 +17,7 @@ impl fmt::Display for AppError {
         match self {
             AppError::MongoError(err) => write!(f, "MongoDB error: {}", err),
             AppError::NotFound(msg) => write!(f, "Not found: {}", msg),
-            AppError::InternalServerError(msg) =>
-                write!(f, "Internal server error: {}", msg),
+            AppError::InternalServerError(msg) => write!(f, "Internal server error: {}", msg),
             AppError::HttpError(msg, status_code) => {
                 write!(f, "HTTP error: {} ({})", msg, status_code.to_string())
             }
@@ -28,10 +28,16 @@ impl fmt::Display for AppError {
 impl ResponseError for AppError {
     fn error_response(&self) -> HttpResponse {
         match self {
-            AppError::MongoError(_) => HttpResponse::InternalServerError().json("Database error"),
-            AppError::NotFound(msg) => HttpResponse::NotFound().json(msg),
-            AppError::InternalServerError(msg) => HttpResponse::InternalServerError().json(msg),
-            AppError::HttpError(msg, status_code) => HttpResponse::build(*status_code).json(msg),
+            AppError::MongoError(_) => HttpResponse::InternalServerError()
+                .json(r#"{"error": "Database error", "status": 500}"#),
+            AppError::NotFound(msg) => {
+                HttpResponse::NotFound().json(SerializableError::new(msg.to_string(), 404))
+            }
+            AppError::InternalServerError(msg) => HttpResponse::InternalServerError()
+                .json(SerializableError::new(msg.to_string(), 500)),
+            AppError::HttpError(msg, status_code) => HttpResponse::build(*status_code).json(
+                SerializableError::new(msg.to_string(), status_code.as_u16()),
+            ),
         }
     }
 }
@@ -60,8 +66,14 @@ impl From<std::io::Error> for AppError {
     }
 }
 
-impl From<(String, StatusCode)> for AppError {
-    fn from((msg, status_code): (String, StatusCode)) -> Self {
-        AppError::HttpError(msg, status_code)
+impl From<(String, u16)> for AppError {
+    fn from((msg, status_code): (String, u16)) -> Self {
+        AppError::HttpError(msg, StatusCode::from_u16(status_code).unwrap())
+    }
+}
+
+impl From<(&str, u16)> for AppError {
+    fn from((msg, status_code): (&str, u16)) -> Self {
+        AppError::HttpError(msg.to_owned(), StatusCode::from_u16(status_code).unwrap())
     }
 }
