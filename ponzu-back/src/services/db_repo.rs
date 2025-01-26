@@ -1,5 +1,5 @@
 use crate::utils::bson::get_object_id;
-use futures::StreamExt;
+use futures::TryStreamExt;
 use mongodb::bson::{doc, Document};
 use mongodb::error::Error;
 use mongodb::options::{AggregateOptions, FindOptions, UpdateModifications};
@@ -36,37 +36,23 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     ///
     /// # Parameters
     /// - `filter`: A MongoDB document specifying the query criteria.
-    /// - `limit`: An optional limit on the number of documents to return.
-    /// - `skip`: An optional number of documents to skip before starting to return documents.
+    /// - `options`: Optional `FindOptions` to configure the find operation.
     ///
     /// # Returns
     /// A `Result` containing a `Vec<T>` of documents if successful, or an `Error` if the operation fails.
     pub async fn find(
         &self,
         filter: Option<Document>,
-        limit: Option<i64>,
-        skip: Option<u64>,
+        options: Option<FindOptions>,
     ) -> Result<Vec<T>, Error> {
-        // Create FindOptions to configure limit and skip
-        let options = FindOptions::builder().limit(limit).skip(skip).build();
-
-        // Execute the query with the provided filter and options
-        let mut cursor = match filter {
-            Some(filter) => self.collection.find(filter),
-            None => self.collection.find(doc! {}),
-        }
-        .with_options(options)
-        .await?;
-
-        // Collect the results into a Vec<T>
-        let mut results = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(doc) => results.push(doc),
-                Err(e) => return Err(e),
-            }
-        }
-        Ok(results)
+        // Execute the query
+        self.collection
+            .find(filter.unwrap_or(doc! {}))
+            .with_options(options)
+            .await?
+            // Collect the results into a Vec<T>
+            .try_collect()
+            .await
     }
 
     /// Finds a single document in the collection that matches the provided filter.
@@ -235,20 +221,11 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
         pipeline: Vec<Document>,
         options: Option<AggregateOptions>,
     ) -> Result<Vec<Document>, Error> {
-        let mut cursor = self
-            .collection
+        self.collection
             .aggregate(pipeline)
             .with_options(options)
-            .await?;
-        let mut results = Vec::new();
-
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(doc) => results.push(doc),
-                Err(e) => return Err(e),
-            }
-        }
-
-        Ok(results)
+            .await?
+            .try_collect()
+            .await
     }
 }

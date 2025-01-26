@@ -71,7 +71,7 @@ where
 ///
 /// # Returns
 /// A `Result` containing the `ObjectId` if successful, or an `Error` if the operation fails.
-pub(crate) fn get_object_id(id: &str) -> Result<ObjectId, mongodb::error::Error> {
+pub fn get_object_id(id: &str) -> Result<ObjectId, mongodb::error::Error> {
     match ObjectId::from_str(id) {
         Ok(oid) => Ok(oid),
         Err(e) => Err(mongodb::error::Error::custom(format!("Invalid ObjectId: {}", e))),
