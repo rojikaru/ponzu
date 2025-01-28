@@ -1,5 +1,4 @@
 use crate::models::app_error::AppError;
-use crate::utils::bson::get_object_id;
 use futures::TryStreamExt;
 use mongodb::bson::{doc, Document};
 use mongodb::error::Error;
@@ -57,28 +56,6 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
             .or_else(|e| Err(AppError::from(e)))
     }
 
-    /// Finds documents in the collection and paginates the results.
-    ///
-    /// # Parameters
-    /// - `filter`: A MongoDB document specifying the query criteria.
-    /// - `page`: The page number to read.
-    /// - `limit`: The number of documents to read per page.
-    ///
-    /// # Returns
-    /// A `Result` containing a `Vec<T>` of documents if successful, or an `AppError` if the operation fails.
-    pub async fn find_paginated(
-        &self,
-        filter: Option<Document>,
-        page: u64,
-        limit: u64,
-    ) -> Result<Vec<T>, AppError> {
-        let options = FindOptions::builder()
-            .skip((page - 1) * limit)
-            .limit(limit as i64)
-            .build();
-        self.find(filter, Some(options)).await
-    }
-
     /// Finds a single document in the collection that matches the provided filter.
     ///
     /// # Parameters
@@ -95,39 +72,6 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
         .or_else(|e: Error| Err(AppError::from(e)))
     }
 
-    /// Finds a single document in the collection by its `_id` field.
-    ///
-    /// # Parameters
-    /// - `id`: The `_id` of the document to find.
-    ///
-    /// # Returns
-    /// A `Result` containing an `Option<T>` if successful, or an `AppError` if the operation fails.
-    /// The `Option<T>` will be `Some(T)` if a document is found, otherwise `None`.
-    pub async fn find_by_id(&self, id: &str) -> Result<Option<T>, AppError> {
-        let oid = get_object_id(id)
-            .or_else(|_| Err(AppError::from(("Ill-formed MongoId", 400))))?;
-        self.find_one(doc! { "_id": oid })
-            .await
-            .or_else(|e| {
-                if e.to_string().contains("not found") {
-                    Err(AppError::NotFound(format!(
-                        "Document with ID {} not found",
-                        id
-                    )))
-                } else {
-                    Err(e)
-                }
-            })
-    }
-
-    /// Returns all documents in the collection.
-    ///
-    /// # Returns
-    /// A `Result` containing a `Vec<T>` of all documents if successful, or an `AppError` if the operation fails.
-    pub async fn find_all(&self) -> Result<Vec<T>, AppError> {
-        self.find(None, None).await
-    }
-
     /// Inserts a single document into the collection.
     ///
     /// # Parameters
@@ -136,12 +80,10 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
     /// # Returns
     /// A document if successful, or an `AppError` if the operation fails.
     pub async fn insert_one(&self, doc: T) -> Result<T, AppError> {
-        match self.collection.insert_one(doc).await?.inserted_id.as_str() {
-            Some(id) => self.find_by_id(id).await?.ok_or_else(|| {
-                AppError::from(format!("Document not found after insert: {:?}", id))
-            }),
-            None => Err(AppError::from("No _id returned after insert")),
-        }
+        let id = self.collection.insert_one(doc).await?.inserted_id;
+        self.find_one(doc! {"_id": id.clone()}).await?.ok_or_else(|| {
+            AppError::from(format!("Document not found after insert: {:?}", id))
+        })
     }
 
     /// Updates a single document in the collection that matches the provided filter.
@@ -163,7 +105,7 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
             .await?
             .upserted_id
         {
-            Some(id) => self.find_by_id(id.as_str().unwrap()).await?.ok_or_else(|| {
+            Some(id) => self.find_one(doc! {"_id": id}).await?.ok_or_else(|| {
                 AppError::from(format!(
                     "Document not found after update: {:?}",
                     filter.clone()
@@ -174,23 +116,6 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
                 filter.clone()
             ))),
         }
-    }
-
-    /// Updates a single document in the collection by its `_id` field.
-    ///
-    /// # Parameters
-    /// - `id`: The `_id` of the document to update.
-    /// - `update`: The update operations to apply to the matching document.
-    ///
-    /// # Returns
-    /// A `Result` containing an updated document if successful, or an `AppError` if the operation fails.
-    pub async fn update_by_id(
-        &self,
-        id: &str,
-        update: impl Into<UpdateModifications>,
-    ) -> Result<T, AppError> {
-        self.update_one(doc! { "_id": get_object_id(id)? }, update)
-            .await
     }
 
     /// Deletes a single document from the collection that matches the provided filter.
@@ -205,17 +130,6 @@ impl<T: Send + Sync + DeserializeOwned + Serialize> DatabaseRepository<T> {
             .delete_one(filter)
             .await
             .or_else(|e| Err(AppError::from(e)))
-    }
-
-    /// Deletes a single document from the collection by its `_id` field.
-    ///
-    /// # Parameters
-    /// - `id`: The `_id` of the document to delete.
-    ///
-    /// # Returns
-    /// A `Result` containing a `DeleteResult` if successful, or an `AppError` if the operation fails.
-    pub async fn delete_by_id(&self, id: &str) -> Result<DeleteResult, AppError> {
-        self.delete_one(doc! { "_id": get_object_id(id)? }).await
     }
 
     /// Deletes multiple documents from the collection that match the provided filter.

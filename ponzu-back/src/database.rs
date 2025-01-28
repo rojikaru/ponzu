@@ -9,7 +9,7 @@ use mongodb::{Client, Database};
 /// `name` - The name of the database
 ///
 /// # Returns
-/// A `Result` containing the `Database` if successful, or an `Error` if the operation fails.
+/// A `Result` containing the `Database` client if successful, or an `Error` if the operation fails.
 pub async fn init_database(conn_str: String, name: String)
     -> Result<Database, Error> {
     // Initialize the database connection
@@ -18,6 +18,6 @@ pub async fn init_database(conn_str: String, name: String)
 
     println!("{} {}!", "Connected to database", name.bright_green());
 
-    // Return the database
+    // Return the database client
     Ok(db)
 }
