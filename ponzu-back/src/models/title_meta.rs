@@ -6,7 +6,6 @@ pub struct MalEntity {
     pub mal_id: u64,
     pub r#type: String,
     pub name: String,
-    pub url: String,
 }
 
 /// Title object with type and title fields.
