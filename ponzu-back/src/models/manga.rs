@@ -1,3 +1,4 @@
+use crate::models::genre::Genre;
 use crate::models::links::{ExternalLink, Images};
 use crate::models::title_meta::{MalEntity, Relation, Title};
 use mongodb::bson::DateTime;
@@ -14,7 +15,6 @@ pub struct Manga {
     )]
     pub id: Option<String>,
     pub mal_id: u64,
-    pub url: String,
     pub images: Images,
     pub approved: bool,
     pub titles: Vec<Title>,
@@ -38,7 +38,7 @@ pub struct Manga {
     pub background: String,
     pub authors: Vec<MalEntity>,
     pub serializations: Vec<MalEntity>,
-    pub genres: Vec<MalEntity>,
+    pub genres: Vec<Genre>,
     pub explicit_genres: Vec<MalEntity>,
     pub themes: Vec<MalEntity>,
     pub demographics: Vec<MalEntity>,

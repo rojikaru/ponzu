@@ -1,3 +1,4 @@
+use crate::models::genre::Genre;
 use crate::models::links::{ExternalLink, Images, Trailer};
 use crate::models::title_meta::{MalEntity, Relation, Theme, Title};
 use mongodb::bson::DateTime;
@@ -14,7 +15,6 @@ pub struct Anime {
     )]
     pub id: Option<String>,
     pub mal_id: u64,
-    pub url: String,
     pub images: Images,
     pub trailer: Trailer,
     pub approved: bool,
@@ -39,7 +39,7 @@ pub struct Anime {
     pub producers: Vec<MalEntity>,
     pub licensors: Vec<MalEntity>,
     pub studios: Vec<MalEntity>,
-    pub genres: Vec<MalEntity>,
+    pub genres: Vec<Genre>,
     pub explicit_genres: Vec<MalEntity>,
     pub themes: Vec<MalEntity>,
     pub demographics: Vec<MalEntity>,
