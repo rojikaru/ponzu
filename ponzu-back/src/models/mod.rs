@@ -9,3 +9,4 @@ pub mod manga;
 pub mod producer;
 pub mod title_meta;
 pub mod user;
+pub mod review;
