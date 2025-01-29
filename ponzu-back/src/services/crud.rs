@@ -1,5 +1,6 @@
-use crate::types::app_error::AppError;
+use crate::dto::pagination::Pagination;
 use crate::services::db_repo::DatabaseRepository;
+use crate::types::app_error::AppError;
 use crate::utils::bson::get_object_id;
 use mongodb::bson::{doc, Document};
 use mongodb::options::{AggregateOptions, FindOptions, UpdateModifications};
@@ -43,13 +44,13 @@ where
     /// - `limit`: The number of documents to read per page.
     ///
     /// # Returns
-    /// A `Vec` of read DTOs.
+    /// A `Pagination` of read DTOs.
     async fn get_paginated(
         &self,
         filter: Option<Document>,
         page: u64,
         limit: u64,
-    ) -> Result<Vec<R>, AppError>;
+    ) -> Result<Pagination<R>, AppError>;
 
     /// Filters entities in the collection.
     ///
@@ -154,7 +155,10 @@ where
     U: Clone + Into<UpdateModifications>,
 {
     fn new(repository: Arc<DatabaseRepository<E>>) -> Self {
-        Self { repository, _phantom: Default::default() }
+        Self {
+            repository,
+            _phantom: Default::default(),
+        }
     }
 
     async fn get_all(&self) -> Result<Vec<R>, AppError> {
@@ -166,12 +170,20 @@ where
         filter: Option<Document>,
         page: u64,
         limit: u64,
-    ) -> Result<Vec<R>, AppError> {
+    ) -> Result<Pagination<R>, AppError> {
         let options = FindOptions::builder()
             .skip((page - 1) * limit)
             .limit(limit as i64)
             .build();
-        self.find(filter, Some(options)).await
+        let vec = self.find(filter.clone(), Some(options)).await?;
+        let total = self.count(filter.clone()).await;
+        Ok(Pagination {
+            current_page: page,
+            last_page: (total as f64 / limit as f64).ceil() as u64,
+            per_page: limit,
+            total,
+            payload: vec,
+        })
     }
 
     async fn find(
