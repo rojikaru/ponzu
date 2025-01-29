@@ -1,10 +1,10 @@
-use std::str::FromStr;
 use mongodb::bson::oid::ObjectId;
 use mongodb::bson::serde_helpers::{
     deserialize_hex_string_from_object_id, serialize_hex_string_as_object_id,
 };
 use serde::ser::Error;
 use serde::Serializer;
+use std::str::FromStr;
 
 /// Serializes an `Option<String>` as an `ObjectId` in hexadecimal format.
 ///
@@ -59,7 +59,7 @@ where
     S: Serializer,
 {
     match value {
-        Some(v) => serializer.serialize_str(&v.try_to_rfc3339_string().unwrap()),
+        Some(v) => serializer.serialize_str(&v.try_to_rfc3339_string().expect("Invalid date")),
         None => serializer.serialize_none(),
     }
 }
@@ -74,6 +74,9 @@ where
 pub fn get_object_id(id: &str) -> Result<ObjectId, mongodb::error::Error> {
     match ObjectId::from_str(id) {
         Ok(oid) => Ok(oid),
-        Err(e) => Err(mongodb::error::Error::custom(format!("Invalid ObjectId: {}", e))),
+        Err(e) => Err(mongodb::error::Error::custom(format!(
+            "Invalid ObjectId: {}",
+            e
+        ))),
     }
 }
