@@ -8,6 +8,7 @@ use database::init_database;
 use dotenv::dotenv;
 
 mod database;
+mod dto;
 mod endpoints;
 mod env;
 mod models;
