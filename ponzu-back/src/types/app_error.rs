@@ -69,12 +69,18 @@ impl From<std::io::Error> for AppError {
 
 impl From<(String, u16)> for AppError {
     fn from((msg, status_code): (String, u16)) -> Self {
-        AppError::HttpError(msg, StatusCode::from_u16(status_code).unwrap())
+        AppError::HttpError(
+            msg,
+            StatusCode::from_u16(status_code).expect("Invalid status code"),
+        )
     }
 }
 
 impl From<(&str, u16)> for AppError {
     fn from((msg, status_code): (&str, u16)) -> Self {
-        AppError::HttpError(msg.to_owned(), StatusCode::from_u16(status_code).unwrap())
+        AppError::HttpError(
+            msg.to_owned(),
+            StatusCode::from_u16(status_code).expect("Invalid status code"),
+        )
     }
 }

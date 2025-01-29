@@ -16,8 +16,10 @@ where
     // Get the unparsed value from the environment
     let unparsed = match default {
         Some(default) => std::env::var(key).unwrap_or(default.to_string()),
-        None => std::env::var(key).unwrap(),
+        None => std::env::var(key).expect(&format!("{} environment variable not found", key)),
     };
     // Return the parsed value
-    unparsed.parse::<T>().unwrap()
+    unparsed
+        .parse::<T>()
+        .expect(&format!("Failed to parse {} as {:?}", key, T::from_str("")))
 }
