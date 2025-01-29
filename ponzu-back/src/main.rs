@@ -1,7 +1,7 @@
 use crate::endpoints::default::default_responder;
 use crate::endpoints::scope::create_app_scope;
 use crate::env::get_from_env;
-use crate::models::app_state::AppState;
+use types::app_state::AppState;
 use actix_web::middleware::{Logger, NormalizePath, TrailingSlash};
 use actix_web::{web, App, HttpServer};
 use database::init_database;
@@ -13,6 +13,7 @@ mod env;
 mod models;
 mod services;
 mod utils;
+mod types;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

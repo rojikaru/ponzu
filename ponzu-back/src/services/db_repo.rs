@@ -1,4 +1,4 @@
-use crate::models::app_error::AppError;
+use crate::types::app_error::AppError;
 use futures::TryStreamExt;
 use mongodb::bson::{doc, Document};
 use mongodb::error::Error;

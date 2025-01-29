@@ -1,4 +1,4 @@
-use crate::models::app_error::AppError;
+use crate::types::app_error::AppError;
 use crate::services::db_repo::DatabaseRepository;
 use crate::utils::bson::get_object_id;
 use mongodb::bson::{doc, Document};

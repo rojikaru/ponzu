@@ -1,4 +1,4 @@
-use crate::models::error_response::SerializableError;
+use crate::types::error_response::SerializableError;
 use actix_web::{HttpRequest, HttpResponse, Responder};
 
 pub async fn default_responder(req: HttpRequest) -> impl Responder {

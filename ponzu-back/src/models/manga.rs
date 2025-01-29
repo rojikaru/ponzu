@@ -1,6 +1,6 @@
 use crate::models::genre::Genre;
-use crate::models::links::{ExternalLink, Images};
-use crate::models::title_meta::{MalEntity, Relation, Title};
+use crate::types::links::{ExternalLink, Images};
+use crate::types::title_meta::{MalEntity, Relation, Title};
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 

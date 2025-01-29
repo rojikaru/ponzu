@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 /// Commonly-used types for title metadata with type, name, and URL fields.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MalEntity {
-    pub mal_id: u64,
     pub r#type: String,
     pub name: String,
 }
