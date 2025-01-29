@@ -6,5 +6,6 @@ pub mod error_response;
 pub mod genre;
 pub mod links;
 pub mod manga;
+pub mod producer;
 pub mod title_meta;
 pub mod user;
