@@ -1,6 +1,7 @@
 use std::fmt;
 use serde::Serialize;
 
+/// Serializable error object with error message and status code.
 #[derive(Debug, Serialize)]
 pub struct SerializableError {
     error: String,

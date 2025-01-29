@@ -2,11 +2,12 @@
 pub mod anime;
 pub mod app_error;
 pub mod app_state;
+pub mod club;
 pub mod error_response;
 pub mod genre;
 pub mod links;
 pub mod manga;
 pub mod producer;
+pub mod review;
 pub mod title_meta;
 pub mod user;
-pub mod review;
