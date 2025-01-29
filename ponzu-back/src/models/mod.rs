@@ -3,7 +3,7 @@ pub mod anime;
 pub mod character;
 pub mod club;
 pub mod genre;
-pub mod links;
+pub mod magazine;
 pub mod manga;
 pub mod person;
 pub mod producer;
