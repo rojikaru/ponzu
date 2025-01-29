@@ -4,6 +4,7 @@ use actix_web::{HttpResponse, ResponseError};
 use mongodb::error::Error as MongoError;
 use std::fmt;
 
+/// Custom error type for the application.
 #[derive(Debug)]
 pub enum AppError {
     MongoError(MongoError),

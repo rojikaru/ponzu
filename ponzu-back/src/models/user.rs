@@ -8,6 +8,7 @@ use mongodb::bson::serde_helpers::{
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
+/// User model
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     #[serde(
@@ -23,7 +24,7 @@ pub struct User {
     pub is_active: bool,
     pub is_staff: bool,
     pub is_superuser: bool,
-    pub image: Option<String>,
+    pub images: Option<String>,
     pub bio: Option<String>,
     #[serde(
         skip_serializing_if = "Option::is_none",
@@ -40,6 +41,11 @@ pub struct User {
         deserialize_with = "deserialize_bson_datetime_from_rfc3339_string"
     )]
     pub updated_at: DateTime,
+    #[serde(
+        serialize_with = "serialize_bson_datetime_as_rfc3339_string",
+        deserialize_with = "deserialize_bson_datetime_from_rfc3339_string"
+    )]
+    pub last_online: DateTime,
 }
 
 impl User {
@@ -50,7 +56,7 @@ impl User {
         is_active: bool,
         is_staff: bool,
         is_superuser: bool,
-        image: Option<String>,
+        images: Option<String>,
         bio: Option<String>,
         birth_date: Option<DateTime>,
     ) -> Self {
@@ -62,11 +68,12 @@ impl User {
             is_active,
             is_staff,
             is_superuser,
-            image,
+            images,
             bio,
             birth_date,
             created_at: DateTime::now(),
             updated_at: DateTime::now(),
+            last_online: DateTime::now(),
         }
     }
 }
