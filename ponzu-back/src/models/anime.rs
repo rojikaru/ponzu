@@ -1,5 +1,6 @@
 use crate::models::genre::Genre;
 use crate::models::links::{ExternalLink, Images, Trailer};
+use crate::models::producer::Producer;
 use crate::models::title_meta::{MalEntity, Relation, Theme, Title};
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
@@ -31,12 +32,18 @@ pub struct Anime {
     pub aired: Option<Aired>,
     pub duration: String,
     pub rating: String,
+    // pub score: f64,
+    pub scored_by: u64,
+    // pub rank: u64,
+    // pub popularity: u64,
+    pub members: u64,
+    pub favorites: u64,
     pub synopsis: String,
     pub background: String,
     pub season: String,
-    pub year: Option<i32>,
+    pub year: Option<u32>,
     pub broadcast: Option<Broadcast>,
-    pub producers: Vec<MalEntity>,
+    pub producers: Vec<Producer>,
     pub licensors: Vec<MalEntity>,
     pub studios: Vec<MalEntity>,
     pub genres: Vec<Genre>,
