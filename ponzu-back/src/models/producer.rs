@@ -1,5 +1,5 @@
-use crate::models::links::{ExternalLink, Images};
-use crate::models::title_meta::MalEntity;
+use crate::types::links::{ExternalLink, Images};
+use crate::types::title_meta::MalEntity;
 use serde::{Deserialize, Serialize};
 
 /// Commonly-used types for title metadata with type, name, and URL fields.

@@ -1,7 +1,7 @@
 use crate::models::genre::Genre;
-use crate::models::links::{ExternalLink, Images, Trailer};
+use crate::types::links::{ExternalLink, Images, Trailer};
 use crate::models::producer::Producer;
-use crate::models::title_meta::{MalEntity, Relation, Theme, Title};
+use crate::types::title_meta::{MalEntity, Relation, Theme, Title};
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 

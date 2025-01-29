@@ -1,4 +1,4 @@
-use crate::models::links::Images;
+use crate::types::links::Images;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

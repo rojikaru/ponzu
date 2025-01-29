@@ -1,4 +1,4 @@
-use crate::models::error_response::SerializableError;
+use crate::types::error_response::SerializableError;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
 use mongodb::error::Error as MongoError;

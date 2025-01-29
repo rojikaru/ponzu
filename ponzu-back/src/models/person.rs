@@ -1,4 +1,4 @@
-use crate::models::links::Images;
+use crate::types::links::Images;
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
