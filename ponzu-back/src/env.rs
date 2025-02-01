@@ -1,3 +1,4 @@
+use std::any::type_name;
 use std::fmt::Debug;
 use std::str::FromStr;
 
@@ -19,7 +20,9 @@ where
         None => std::env::var(key).expect(&format!("{} environment variable not found", key)),
     };
     // Return the parsed value
-    unparsed
-        .parse::<T>()
-        .expect(&format!("Failed to parse {} as {:?}", key, T::from_str("")))
+    unparsed.parse::<T>().expect(&format!(
+        "Failed to parse {} as {:?}",
+        key,
+        type_name::<T>()
+    ))
 }

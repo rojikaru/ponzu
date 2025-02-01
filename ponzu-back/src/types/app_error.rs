@@ -14,7 +14,7 @@ pub enum AppError {
 }
 
 impl fmt::Display for AppError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             AppError::MongoError(err) => write!(f, "MongoDB error: {}", err),
             AppError::NotFound(msg) => write!(f, "Not found: {}", msg),
