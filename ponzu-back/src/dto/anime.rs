@@ -7,7 +7,8 @@ use crate::utils::bson::{
     deserialize_option_hex_string_from_object_id, serialize_option_bson_datetime_as_rfc3339_string,
     serialize_option_hex_string_as_object_id,
 };
-use mongodb::bson::DateTime;
+use mongodb::bson::{doc, to_bson, DateTime, Document};
+use mongodb::options::UpdateModifications;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -259,6 +260,231 @@ impl From<CreateAnimeDto> for Anime {
             external: dto.external,
             streaming: dto.streaming,
         }
+    }
+}
+
+impl From<UpdateAnimeDto> for UpdateModifications {
+    fn from(dto: UpdateAnimeDto) -> Self {
+        let mut doc = Document::new();
+
+        if let Some(mal_id) = dto.mal_id {
+            doc.insert(
+                "mal_id",
+                to_bson(&mal_id).expect("Failed to convert mal_id to bson"),
+            );
+        }
+        if let Some(images) = dto.images {
+            doc.insert(
+                "images",
+                to_bson(&images).expect("Failed to convert images to bson"),
+            );
+        }
+        if let Some(trailer) = dto.trailer {
+            doc.insert(
+                "trailer",
+                to_bson(&trailer).expect("Failed to convert trailer to bson"),
+            );
+        }
+        if let Some(approved) = dto.approved {
+            doc.insert(
+                "approved",
+                to_bson(&approved).expect("Failed to convert approved to bson"),
+            );
+        }
+        if let Some(titles) = dto.titles {
+            doc.insert(
+                "titles",
+                to_bson(&titles).expect("Failed to convert titles to bson"),
+            );
+        }
+        if let Some(title) = dto.title {
+            doc.insert(
+                "title",
+                to_bson(&title).expect("Failed to convert title to bson"),
+            );
+        }
+        if let Some(title_english) = dto.title_english {
+            doc.insert(
+                "title_english",
+                to_bson(&title_english).expect("Failed to convert title_english to bson"),
+            );
+        }
+        if let Some(title_japanese) = dto.title_japanese {
+            doc.insert(
+                "title_japanese",
+                to_bson(&title_japanese).expect("Failed to convert title_japanese to bson"),
+            );
+        }
+        if let Some(title_synonyms) = dto.title_synonyms {
+            doc.insert(
+                "title_synonyms",
+                to_bson(&title_synonyms).expect("Failed to convert title_synonyms to bson"),
+            );
+        }
+        if let Some(r#type) = dto.r#type {
+            doc.insert(
+                "type",
+                to_bson(&r#type).expect("Failed to convert type to bson"),
+            );
+        }
+        if let Some(source) = dto.source {
+            doc.insert(
+                "source",
+                to_bson(&source).expect("Failed to convert source to bson"),
+            );
+        }
+        if let Some(episodes) = dto.episodes {
+            doc.insert(
+                "episodes",
+                to_bson(&episodes).expect("Failed to convert episodes to bson"),
+            );
+        }
+        if let Some(status) = dto.status {
+            doc.insert(
+                "status",
+                to_bson(&status).expect("Failed to convert status to bson"),
+            );
+        }
+        if let Some(airing) = dto.airing {
+            doc.insert(
+                "airing",
+                to_bson(&airing).expect("Failed to convert airing to bson"),
+            );
+        }
+        if let Some(aired) = dto.aired {
+            doc.insert(
+                "aired",
+                to_bson(&aired).expect("Failed to convert aired to bson"),
+            );
+        }
+        if let Some(duration) = dto.duration {
+            doc.insert(
+                "duration",
+                to_bson(&duration).expect("Failed to convert duration to bson"),
+            );
+        }
+        if let Some(rating) = dto.rating {
+            doc.insert(
+                "rating",
+                to_bson(&rating).expect("Failed to convert rating to bson"),
+            );
+        }
+        if let Some(scored_by) = dto.scored_by {
+            doc.insert(
+                "scored_by",
+                to_bson(&scored_by).expect("Failed to convert scored_by to bson"),
+            );
+        }
+        if let Some(members) = dto.members {
+            doc.insert(
+                "members",
+                to_bson(&members).expect("Failed to convert members to bson"),
+            );
+        }
+        if let Some(favorites) = dto.favorites {
+            doc.insert(
+                "favorites",
+                to_bson(&favorites).expect("Failed to convert favorites to bson"),
+            );
+        }
+        if let Some(synopsis) = dto.synopsis {
+            doc.insert(
+                "synopsis",
+                to_bson(&synopsis).expect("Failed to convert synopsis to bson"),
+            );
+        }
+        if let Some(background) = dto.background {
+            doc.insert(
+                "background",
+                to_bson(&background).expect("Failed to convert background to bson"),
+            );
+        }
+        if let Some(season) = dto.season {
+            doc.insert(
+                "season",
+                to_bson(&season).expect("Failed to convert season to bson"),
+            );
+        }
+        if let Some(year) = dto.year {
+            doc.insert(
+                "year",
+                to_bson(&year).expect("Failed to convert year to bson"),
+            );
+        }
+        if let Some(broadcast) = dto.broadcast {
+            doc.insert(
+                "broadcast",
+                to_bson(&broadcast).expect("Failed to convert broadcast to bson"),
+            );
+        }
+        if let Some(producers) = dto.producers {
+            doc.insert(
+                "producers",
+                to_bson(&producers).expect("Failed to convert producers to bson"),
+            );
+        }
+        if let Some(licensors) = dto.licensors {
+            doc.insert(
+                "licensors",
+                to_bson(&licensors).expect("Failed to convert licensors to bson"),
+            );
+        }
+        if let Some(studios) = dto.studios {
+            doc.insert(
+                "studios",
+                to_bson(&studios).expect("Failed to convert studios to bson"),
+            );
+        }
+        if let Some(genres) = dto.genres {
+            doc.insert(
+                "genres",
+                to_bson(&genres).expect("Failed to convert genres to bson"),
+            );
+        }
+        if let Some(explicit_genres) = dto.explicit_genres {
+            doc.insert(
+                "explicit_genres",
+                to_bson(&explicit_genres).expect("Failed to convert explicit_genres to bson"),
+            );
+        }
+        if let Some(themes) = dto.themes {
+            doc.insert(
+                "themes",
+                to_bson(&themes).expect("Failed to convert themes to bson"),
+            );
+        }
+        if let Some(demographics) = dto.demographics {
+            doc.insert(
+                "demographics",
+                to_bson(&demographics).expect("Failed to convert demographics to bson"),
+            );
+        }
+        if let Some(relations) = dto.relations {
+            doc.insert(
+                "relations",
+                to_bson(&relations).expect("Failed to convert relations to bson"),
+            );
+        }
+        if let Some(theme) = dto.theme {
+            doc.insert(
+                "theme",
+                to_bson(&theme).expect("Failed to convert theme to bson"),
+            );
+        }
+        if let Some(external) = dto.external {
+            doc.insert(
+                "external",
+                to_bson(&external).expect("Failed to convert external to bson"),
+            );
+        }
+        if let Some(streaming) = dto.streaming {
+            doc.insert(
+                "streaming",
+                to_bson(&streaming).expect("Failed to convert streaming to bson"),
+            );
+        }
+
+        UpdateModifications::Document(doc)
     }
 }
 

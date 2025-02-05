@@ -3,7 +3,10 @@ use crate::types::links::Images;
 use crate::utils::bson::{
     deserialize_option_hex_string_from_object_id, serialize_option_hex_string_as_object_id,
 };
+use mongodb::bson::{to_bson, Document};
+use mongodb::options::UpdateModifications;
 use serde::{Deserialize, Serialize};
+
 /// A simplified character object.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CharacterReference {
@@ -112,6 +115,78 @@ impl From<CreateCharacterDto> for Character {
             manga: dto.manga.into_iter().map(Into::into).collect(),
             voices: dto.voices.into_iter().map(Into::into).collect(),
         }
+    }
+}
+
+impl From<UpdateCharacterDto> for UpdateModifications {
+    fn from(dto: UpdateCharacterDto) -> Self {
+        let mut doc = Document::new();
+
+        if let Some(mal_id) = dto.mal_id {
+            doc.insert(
+                "mal_id",
+                to_bson(&mal_id).expect("Failed to convert mal_id to bson"),
+            );
+        }
+        if let Some(url) = dto.url {
+            doc.insert("url", to_bson(&url).expect("Failed to convert url to bson"));
+        }
+        if let Some(images) = dto.images {
+            doc.insert(
+                "images",
+                to_bson(&images).expect("Failed to convert images to bson"),
+            );
+        }
+        if let Some(name) = dto.name {
+            doc.insert(
+                "name",
+                to_bson(&name).expect("Failed to convert name to bson"),
+            );
+        }
+        if let Some(name_kanji) = dto.name_kanji {
+            doc.insert(
+                "name_kanji",
+                to_bson(&name_kanji).expect("Failed to convert name_kanji to bson"),
+            );
+        }
+        if let Some(nicknames) = dto.nicknames {
+            doc.insert(
+                "nicknames",
+                to_bson(&nicknames).expect("Failed to convert nicknames to bson"),
+            );
+        }
+        if let Some(favorites) = dto.favorites {
+            doc.insert(
+                "favorites",
+                to_bson(&favorites).expect("Failed to convert favorites to bson"),
+            );
+        }
+        if let Some(about) = dto.about {
+            doc.insert(
+                "about",
+                to_bson(&about).expect("Failed to convert about to bson"),
+            );
+        }
+        if let Some(anime) = dto.anime {
+            doc.insert(
+                "anime",
+                to_bson(&anime).expect("Failed to convert anime to bson"),
+            );
+        }
+        if let Some(manga) = dto.manga {
+            doc.insert(
+                "manga",
+                to_bson(&manga).expect("Failed to convert manga to bson"),
+            );
+        }
+        if let Some(voices) = dto.voices {
+            doc.insert(
+                "voices",
+                to_bson(&voices).expect("Failed to convert voices to bson"),
+            );
+        }
+
+        UpdateModifications::Document(doc)
     }
 }
 

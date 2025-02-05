@@ -6,6 +6,8 @@ use crate::utils::bson::{
 };
 use mongodb::bson::serde_helpers::serialize_bson_datetime_as_rfc3339_string;
 use mongodb::bson::DateTime;
+use mongodb::bson::{to_bson, Document};
+use mongodb::options::UpdateModifications;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -129,6 +131,96 @@ impl From<CreatePersonDto> for Person {
             manga: dto.manga.into_iter().map(Into::into).collect(),
             voices: dto.voices.into_iter().map(Into::into).collect(),
         }
+    }
+}
+
+impl From<UpdatePersonDto> for UpdateModifications {
+    fn from(dto: UpdatePersonDto) -> Self {
+        let mut doc = Document::new();
+
+        if let Some(mal_id) = dto.mal_id {
+            doc.insert(
+                "mal_id",
+                to_bson(&mal_id).expect("Failed to convert mal_id to bson"),
+            );
+        }
+        if let Some(url) = dto.url {
+            doc.insert("url", to_bson(&url).expect("Failed to convert url to bson"));
+        }
+        if let Some(website_url) = dto.website_url {
+            doc.insert(
+                "website_url",
+                to_bson(&website_url).expect("Failed to convert website_url to bson"),
+            );
+        }
+        if let Some(images) = dto.images {
+            doc.insert(
+                "images",
+                to_bson(&images).expect("Failed to convert images to bson"),
+            );
+        }
+        if let Some(name) = dto.name {
+            doc.insert(
+                "name",
+                to_bson(&name).expect("Failed to convert name to bson"),
+            );
+        }
+        if let Some(given_name) = dto.given_name {
+            doc.insert(
+                "given_name",
+                to_bson(&given_name).expect("Failed to convert given_name to bson"),
+            );
+        }
+        if let Some(family_name) = dto.family_name {
+            doc.insert(
+                "family_name",
+                to_bson(&family_name).expect("Failed to convert family_name to bson"),
+            );
+        }
+        if let Some(alternate_names) = dto.alternate_names {
+            doc.insert(
+                "alternate_names",
+                to_bson(&alternate_names).expect("Failed to convert alternate_names to bson"),
+            );
+        }
+        if let Some(birthday) = dto.birthday {
+            doc.insert(
+                "birthday",
+                to_bson(&birthday).expect("Failed to convert birthday to bson"),
+            );
+        }
+        if let Some(favorites) = dto.favorites {
+            doc.insert(
+                "favorites",
+                to_bson(&favorites).expect("Failed to convert favorites to bson"),
+            );
+        }
+        if let Some(about) = dto.about {
+            doc.insert(
+                "about",
+                to_bson(&about).expect("Failed to convert about to bson"),
+            );
+        }
+        if let Some(anime) = dto.anime {
+            doc.insert(
+                "anime",
+                to_bson(&anime).expect("Failed to convert anime to bson"),
+            );
+        }
+        if let Some(manga) = dto.manga {
+            doc.insert(
+                "manga",
+                to_bson(&manga).expect("Failed to convert manga to bson"),
+            );
+        }
+        if let Some(voices) = dto.voices {
+            doc.insert(
+                "voices",
+                to_bson(&voices).expect("Failed to convert voices to bson"),
+            );
+        }
+
+        UpdateModifications::Document(doc)
     }
 }
 

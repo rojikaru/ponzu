@@ -5,6 +5,8 @@ use crate::utils::bson::{
 };
 use mongodb::bson::serde_helpers::serialize_bson_datetime_as_rfc3339_string;
 use mongodb::bson::DateTime;
+use mongodb::bson::{to_bson, Document};
+use mongodb::options::UpdateModifications;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -131,5 +133,65 @@ impl From<RegisterUserDto> for User {
             updated_at: DateTime::now(),
             last_online: DateTime::now(),
         }
+    }
+}
+
+impl From<UpdateUserDto> for UpdateModifications {
+    fn from(dto: UpdateUserDto) -> Self {
+        let mut doc = Document::new();
+
+        if let Some(username) = dto.username {
+            doc.insert(
+                "username",
+                to_bson(&username).expect("Failed to convert username to bson"),
+            );
+        }
+        if let Some(email) = dto.email {
+            doc.insert(
+                "email",
+                to_bson(&email).expect("Failed to convert email to bson"),
+            );
+        }
+        if let Some(password) = dto.password {
+            doc.insert(
+                "password",
+                to_bson(&password).expect("Failed to convert password to bson"),
+            );
+        }
+        if let Some(is_active) = dto.is_active {
+            doc.insert(
+                "is_active",
+                to_bson(&is_active).expect("Failed to convert is_active to bson"),
+            );
+        }
+        if let Some(is_staff) = dto.is_staff {
+            doc.insert(
+                "is_staff",
+                to_bson(&is_staff).expect("Failed to convert is_staff to bson"),
+            );
+        }
+        if let Some(is_superuser) = dto.is_superuser {
+            doc.insert(
+                "is_superuser",
+                to_bson(&is_superuser).expect("Failed to convert is_superuser to bson"),
+            );
+        }
+        if let Some(images) = dto.images {
+            doc.insert(
+                "images",
+                to_bson(&images).expect("Failed to convert images to bson"),
+            );
+        }
+        if let Some(bio) = dto.bio {
+            doc.insert("bio", to_bson(&bio).expect("Failed to convert bio to bson"));
+        }
+        if let Some(birth_date) = dto.birth_date {
+            doc.insert(
+                "birth_date",
+                to_bson(&birth_date).expect("Failed to convert birth_date to bson"),
+            );
+        }
+
+        UpdateModifications::Document(doc)
     }
 }
