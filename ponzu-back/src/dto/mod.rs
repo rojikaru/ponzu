@@ -6,3 +6,4 @@ pub mod genre;
 pub mod magazine;
 pub mod manga;
 pub mod pagination;
+pub mod person;
