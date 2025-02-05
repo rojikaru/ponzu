@@ -7,3 +7,4 @@ pub mod magazine;
 pub mod manga;
 pub mod pagination;
 pub mod person;
+pub mod producer;
