@@ -1,5 +1,10 @@
 use crate::models::person::{Person, PersonMedia, PersonVoice};
 use crate::types::links::Images;
+use crate::utils::bson::{
+    deserialize_option_hex_string_from_object_id, serialize_option_bson_datetime_as_rfc3339_string,
+    serialize_option_hex_string_as_object_id,
+};
+use mongodb::bson::serde_helpers::serialize_bson_datetime_as_rfc3339_string;
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
@@ -20,10 +25,7 @@ pub struct PersonDto {
     pub given_name: String,
     pub family_name: String,
     pub alternate_names: Vec<String>,
-    #[serde(
-        serialize_with = "serialize_bson_datetime_as_rfc3339_string",
-        deserialize_with = "deserialize_bson_datetime_from_rfc3339_string"
-    )]
+    #[serde(serialize_with = "serialize_bson_datetime_as_rfc3339_string")]
     pub birthday: DateTime,
     pub favorites: u64,
     pub about: String,
@@ -55,10 +57,7 @@ pub struct CreatePersonDto {
     pub given_name: String,
     pub family_name: String,
     pub alternate_names: Vec<String>,
-    #[serde(
-        serialize_with = "serialize_bson_datetime_as_rfc3339_string",
-        deserialize_with = "deserialize_bson_datetime_from_rfc3339_string"
-    )]
+    #[serde(serialize_with = "serialize_bson_datetime_as_rfc3339_string")]
     pub birthday: DateTime,
     pub favorites: u64,
     pub about: String,

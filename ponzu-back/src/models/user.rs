@@ -9,7 +9,7 @@ use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
 /// User model
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct User {
     #[serde(
         rename = "_id",
