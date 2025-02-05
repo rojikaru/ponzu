@@ -1,4 +1,9 @@
 use crate::models::review::{Reactions, Review};
+use crate::utils::bson::{
+    deserialize_option_hex_string_from_object_id, serialize_option_bson_datetime_as_rfc3339_string,
+    serialize_option_hex_string_as_object_id,
+};
+use mongodb::bson::serde_helpers::serialize_bson_datetime_as_rfc3339_string;
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
@@ -15,10 +20,7 @@ pub struct ReviewDto {
     pub url: String,
     pub r#type: String,
     pub reactions: ReactionsDto,
-    #[serde(
-        serialize_with = "serialize_bson_datetime_as_rfc3339_string",
-        deserialize_with = "deserialize_bson_datetime_from_rfc3339_string"
-    )]
+    #[serde(serialize_with = "serialize_bson_datetime_as_rfc3339_string")]
     pub date: DateTime,
     pub review: String,
     pub score: u8,
@@ -49,10 +51,7 @@ pub struct CreateReviewDto {
     pub url: String,
     pub r#type: String,
     pub reactions: ReactionsDto,
-    #[serde(
-        serialize_with = "serialize_bson_datetime_as_rfc3339_string",
-        deserialize_with = "deserialize_bson_datetime_from_rfc3339_string"
-    )]
+    #[serde(serialize_with = "serialize_bson_datetime_as_rfc3339_string")]
     pub date: DateTime,
     pub review: String,
     pub score: u8,
