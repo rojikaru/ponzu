@@ -6,6 +6,9 @@ use mongodb::bson::serde_helpers::serialize_bson_datetime_as_rfc3339_string;
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
+use mongodb::bson::{to_bson, Document};
+use mongodb::options::UpdateModifications;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ClubDto {
     #[serde(
@@ -72,5 +75,44 @@ impl From<CreateClubDto> for Club {
             created_at: now,
             updated_at: now,
         }
+    }
+}
+
+impl From<UpdateClubDto> for UpdateModifications {
+    fn from(dto: UpdateClubDto) -> Self {
+        let mut doc = Document::new();
+
+        if let Some(name) = dto.name {
+            doc.insert(
+                "name",
+                to_bson(&name).expect("Failed to convert name to bson"),
+            );
+        }
+        if let Some(description) = dto.description {
+            doc.insert(
+                "description",
+                to_bson(&description).expect("Failed to convert description to bson"),
+            );
+        }
+        if let Some(members) = dto.members {
+            doc.insert(
+                "members",
+                to_bson(&members).expect("Failed to convert members to bson"),
+            );
+        }
+        if let Some(access) = dto.access {
+            doc.insert(
+                "access",
+                to_bson(&access).expect("Failed to convert access to bson"),
+            );
+        }
+        if let Some(category) = dto.category {
+            doc.insert(
+                "category",
+                to_bson(&category).expect("Failed to convert category to bson"),
+            );
+        }
+
+        UpdateModifications::Document(doc)
     }
 }

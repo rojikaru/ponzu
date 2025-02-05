@@ -4,6 +4,9 @@ use crate::utils::bson::{
 };
 use serde::{Deserialize, Serialize};
 
+use mongodb::bson::{to_bson, Document};
+use mongodb::options::UpdateModifications;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MagazineDto {
     #[serde(
@@ -51,5 +54,32 @@ impl From<CreateMagazineDto> for Magazine {
             name: dto.name,
             count: dto.count,
         }
+    }
+}
+
+impl From<UpdateMagazineDto> for UpdateModifications {
+    fn from(dto: UpdateMagazineDto) -> Self {
+        let mut doc = Document::new();
+
+        if let Some(mal_id) = dto.mal_id {
+            doc.insert(
+                "mal_id",
+                to_bson(&mal_id).expect("Failed to convert mal_id to bson"),
+            );
+        }
+        if let Some(name) = dto.name {
+            doc.insert(
+                "name",
+                to_bson(&name).expect("Failed to convert name to bson"),
+            );
+        }
+        if let Some(count) = dto.count {
+            doc.insert(
+                "count",
+                to_bson(&count).expect("Failed to convert count to bson"),
+            );
+        }
+
+        UpdateModifications::Document(doc)
     }
 }

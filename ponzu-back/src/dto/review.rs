@@ -5,6 +5,8 @@ use crate::utils::bson::{
 };
 use mongodb::bson::serde_helpers::serialize_bson_datetime_as_rfc3339_string;
 use mongodb::bson::DateTime;
+use mongodb::bson::{to_bson, Document};
+use mongodb::options::UpdateModifications;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -145,6 +147,90 @@ impl From<CreateReviewDto> for Review {
             entry: dto.entry,
             user: dto.user,
         }
+    }
+}
+
+impl From<UpdateReviewDto> for UpdateModifications {
+    fn from(dto: UpdateReviewDto) -> Self {
+        let mut doc = Document::new();
+
+        if let Some(mal_id) = dto.mal_id {
+            doc.insert(
+                "mal_id",
+                to_bson(&mal_id).expect("Failed to convert mal_id to bson"),
+            );
+        }
+        if let Some(url) = dto.url {
+            doc.insert("url", to_bson(&url).expect("Failed to convert url to bson"));
+        }
+        if let Some(r#type) = dto.r#type {
+            doc.insert(
+                "type",
+                to_bson(&r#type).expect("Failed to convert type to bson"),
+            );
+        }
+        if let Some(reactions) = dto.reactions {
+            doc.insert(
+                "reactions",
+                to_bson(&reactions).expect("Failed to convert reactions to bson"),
+            );
+        }
+        if let Some(date) = dto.date {
+            doc.insert(
+                "date",
+                to_bson(&date).expect("Failed to convert date to bson"),
+            );
+        }
+        if let Some(review) = dto.review {
+            doc.insert(
+                "review",
+                to_bson(&review).expect("Failed to convert review to bson"),
+            );
+        }
+        if let Some(score) = dto.score {
+            doc.insert(
+                "score",
+                to_bson(&score).expect("Failed to convert score to bson"),
+            );
+        }
+        if let Some(tags) = dto.tags {
+            doc.insert(
+                "tags",
+                to_bson(&tags).expect("Failed to convert tags to bson"),
+            );
+        }
+        if let Some(is_spoiler) = dto.is_spoiler {
+            doc.insert(
+                "is_spoiler",
+                to_bson(&is_spoiler).expect("Failed to convert is_spoiler to bson"),
+            );
+        }
+        if let Some(is_preliminary) = dto.is_preliminary {
+            doc.insert(
+                "is_preliminary",
+                to_bson(&is_preliminary).expect("Failed to convert is_preliminary to bson"),
+            );
+        }
+        if let Some(episodes_watched) = dto.episodes_watched {
+            doc.insert(
+                "episodes_watched",
+                to_bson(&episodes_watched).expect("Failed to convert episodes_watched to bson"),
+            );
+        }
+        if let Some(entry) = dto.entry {
+            doc.insert(
+                "entry",
+                to_bson(&entry).expect("Failed to convert entry to bson"),
+            );
+        }
+        if let Some(user) = dto.user {
+            doc.insert(
+                "user",
+                to_bson(&user).expect("Failed to convert user to bson"),
+            );
+        }
+
+        UpdateModifications::Document(doc)
     }
 }
 
