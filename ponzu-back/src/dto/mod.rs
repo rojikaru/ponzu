@@ -1,4 +1,4 @@
-pub mod entry;
-pub mod character;
-pub mod pagination;
 pub mod anime;
+pub mod character;
+pub mod entry;
+pub mod pagination;
