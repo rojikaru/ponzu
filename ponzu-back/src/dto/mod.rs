@@ -8,3 +8,4 @@ pub mod manga;
 pub mod pagination;
 pub mod person;
 pub mod producer;
+pub mod review;
