@@ -1,28 +1,28 @@
 {
-  "name": "web",
-  "version": "0.1.0",
-  "type": "module",
+  "name": "@ponzu/web",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack --port 3000",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint --max-warnings 0",
-    "check-types": "tsc --noEmit"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@ponzu/ui": "workspace:*",
-    "next": "^15.4.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
-  },
-  "devDependencies": {
-    "@ponzu/eslint-config": "workspace:*",
-    "@ponzu/typescript-config": "workspace:*",
-    "@types/node": "^22.15.3",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.1",
-    "eslint": "^9.31.0",
-    "typescript": "5.8.2"
+    "@nuxt/content": "3.6.3",
+    "@nuxt/eslint": "1.7.1",
+    "@nuxt/image": "1.11.0",
+    "@nuxt/scripts": "0.11.10",
+    "@nuxt/test-utils": "3.19.2",
+    "@nuxt/ui": "3.3.0",
+    "@unhead/vue": "^2.0.3",
+    "better-sqlite3": "^12.2.0",
+    "eslint": "^9.0.0",
+    "nuxt": "^4.0.1",
+    "typescript": "^5.6.3",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
   }
 }
