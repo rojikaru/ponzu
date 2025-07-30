@@ -11,18 +11,18 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
-    "next": "^15.3.0",
+    "@ponzu/ui": "workspace:*",
+    "next": "^15.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@ponzu/eslint-config": "workspace:*",
+    "@ponzu/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",
-    "eslint": "^9.30.0",
+    "eslint": "^9.31.0",
     "typescript": "5.8.2"
   }
 }
