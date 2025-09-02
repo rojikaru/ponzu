@@ -30,24 +30,29 @@ FROM base AS deps
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
-    --mount=type=cache,target=/root/.local/share/pnpm/store \
+    --mount=type=bind,source=pnpm-workspace.yaml,target=pnpm-workspace.yaml \
+    --mount=type=bind,source=apps/auth-service/package.json,target=apps/auth-service/package.json \
     pnpm install --prod --frozen-lockfile
 
 ################################################################################
 # Create a stage for building the application.
-FROM deps AS build
+FROM base AS build
+
+# Copy package.json so that package manager commands can be used.
+# Copy pnpm-workspace.yaml to ensure workspace dependencies & name resolution are handled.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/auth-service/package.json ./apps/auth-service/package.json
 
 # Download additional development dependencies before building, as some projects require
 # "devDependencies" to be installed to build. If you don't need this, remove this step.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
-    --mount=type=cache,target=/root/.local/share/pnpm/store \
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
 # Copy the rest of the source files into the image.
-COPY . .
+COPY apps/auth-service/ ./apps/auth-service/
+
 # Run the build script.
-RUN pnpm run build
+RUN pnpm turbo run build --filter @ponzu/auth-service
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies
@@ -66,7 +71,9 @@ COPY package.json .
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/dist ./dist
+COPY --from=deps /usr/src/app/apps/auth-service/node_modules ./apps/auth-service/node_modules
+COPY --from=build /usr/src/app/apps/auth-service/package.json ./apps/auth-service/package.json
+COPY --from=build /usr/src/app/apps/auth-service/dist ./apps/auth-service/dist
 
 # Expose the port that the application listens on.
 EXPOSE 8080

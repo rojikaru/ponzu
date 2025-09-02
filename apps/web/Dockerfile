@@ -30,24 +30,30 @@ FROM base AS deps
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
+    --mount=type=bind,source=pnpm-workspace.yaml,target=pnpm-workspace.yaml \
+    --mount=type=bind,source=apps/web/package.json,target=apps/web/package.json \
     --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --prod --frozen-lockfile
 
 ################################################################################
 # Create a stage for building the application.
-FROM deps AS build
+FROM base AS build
+
+# Copy package.json so that package manager commands can be used.
+# Copy pnpm-workspace.yaml to ensure workspace dependencies & name resolution are handled.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/web/package.json ./apps/web/package.json
 
 # Download additional development dependencies before building, as some projects require
 # "devDependencies" to be installed to build. If you don't need this, remove this step.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
-    --mount=type=cache,target=/root/.local/share/pnpm/store \
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
 # Copy the rest of the source files into the image.
-COPY . .
+COPY apps/web/ ./apps/web/
+
 # Run the build script.
-RUN pnpm run build
+RUN pnpm turbo run build --filter @ponzu/web
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies
@@ -60,17 +66,16 @@ ENV NODE_ENV=production
 # Run the application as a non-root user.
 USER node
 
-# Copy package.json so that package manager commands can be used.
-COPY package.json .
-
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/.output ./.output
-
+COPY --from=deps /usr/src/app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=build /usr/src/app/apps/web/package.json ./apps/web/package.json
+COPY --from=build /usr/src/app/apps/web/.output ./apps/web/.output
 
 # Expose the port that the application listens on.
 EXPOSE 3000
 
 # Run the application.
+# CMD ["node", "apps/web/.output/server/index.js"]
 CMD ["pnpm", "run", "start"]
