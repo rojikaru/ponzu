@@ -51,6 +51,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 
 # Copy the rest of the source files into the image.
 COPY apps/web/ ./apps/web/
+COPY packages/ ./packages/
 
 # Run the build script.
 RUN pnpm turbo run build --filter @ponzu/web
@@ -68,7 +69,6 @@ USER node
 
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
-COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=deps /usr/src/app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=build /usr/src/app/apps/web/package.json ./apps/web/package.json
 COPY --from=build /usr/src/app/apps/web/.output ./apps/web/.output
@@ -77,5 +77,4 @@ COPY --from=build /usr/src/app/apps/web/.output ./apps/web/.output
 EXPOSE 3000
 
 # Run the application.
-# CMD ["node", "apps/web/.output/server/index.js"]
-CMD ["pnpm", "run", "start"]
+CMD ["node", "apps/web/.output/server/index.mjs"]

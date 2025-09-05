@@ -50,6 +50,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 
 # Copy the rest of the source files into the image.
 COPY apps/auth-service/ ./apps/auth-service/
+COPY packages/ ./packages/
 
 # Run the build script.
 RUN pnpm turbo run build --filter @ponzu/auth-service
@@ -79,4 +80,4 @@ COPY --from=build /usr/src/app/apps/auth-service/dist ./apps/auth-service/dist
 EXPOSE 8080
 
 # Run the application.
-CMD ["pnpm", "run", "start"]
+CMD ["node", "apps/auth-service/dist/main.js"]
