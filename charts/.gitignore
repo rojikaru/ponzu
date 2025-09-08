@@ -1,0 +1,13 @@
+# Ignore local overrides and temp files
+*.local.yaml
+*.bak
+*.swp
+*.tmp
+
+# Ignore Helm chart dependencies
+charts/
+
+# Ignore Helm release files
+releases/
+*.tgz
+*.tar.gz
